@@ -7,7 +7,7 @@ Mona Bärenfänger <mona@lightcurve.io>
 :idseparator: -
 :idprefix:
 // Project URLs
-:url_aes_glossary: ROOT:glossary.adoc#aes-256-cbc-advanced-encryption-standard
+:url_aes_glossary: ROOT::glossary.adoc#aes-256-cbc-advanced-encryption-standard
 
 == General commands
 

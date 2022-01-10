@@ -4,7 +4,7 @@
 :idprefix:
 :idseparator: -
 // Project URLs
-:url_lisk_framework: ROOT:glossary.adoc#lisk-framework
+:url_lisk_framework: ROOT::glossary.adoc#lisk-framework
 
 `@liskhq/lisk-framework-report-misbehavior-plugin` is a plugin for the xref:{url_lisk_framework}[Lisk Framework] that provides automatic detection of delegate misbehavior and sends a `reportDelegateMisbehaviorTransaction` to the running node.
 

@@ -2,7 +2,7 @@
 :description: The HTTP API plugin description covers all specifications and associated information including restrictions, endpoints, paths, and definitions.
 :toc: preamble
 
-:url_utf_glossary: ROOT:glossary.adoc#utf-8-unicode-transformation-format-8
+:url_utf_glossary: ROOT::glossary.adoc#utf-8-unicode-transformation-format-8
 
 `@liskhq/lisk-framework-http-api-plugin` is a plugin for the Lisk Framework that provides basic HTTP API endpoints to get running node information.
 
