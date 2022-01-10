@@ -3,7 +3,7 @@ Mona Bärenfänger <mona@lightcurve.io>
 // Settings
 :page-aliases: lisk-elements/index.adoc, lisk-elements/packages.adoc, reference/lisk-elements/packages.adoc
 :toc: preamble
-:imagesdir: ../../../assets/images
+:imagesdir: ../../../images
 :page-previous: /lisk-sdk/references/lisk-commander/index.html
 :page-previous-title: Lisk Commander
 :title-logo-image: image:test-logo.png[]

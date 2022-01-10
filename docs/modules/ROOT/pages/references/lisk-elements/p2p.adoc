@@ -1,7 +1,7 @@
 = P2P
 :description: How to install, update, and use the P2P library together with some relevant examples.
 :toc:
-:imagesdir: ../../assets/images
+:imagesdir: ../../images
 
 :url_examples: https://github.com/LiskHQ/lisk-sdk/tree/development/elements/lisk-p2p/examples
 :url_echo_example: https://github.com/LiskHQ/lisk-sdk/tree/development/elements/lisk-p2p/examples/echo

@@ -3,7 +3,7 @@ Mona Bärenfänger <mona@lightcurve.io>
 // Settings
 :page-aliases: lisk-commander/index.adoc, lisk-commander/user-guide.adoc, reference/lisk-commander/user-guide.adoc
 :toc: preamble
-:imagesdir: ../../../assets/images
+:imagesdir: ../../../images
 // URLs
 :url_nodejs_download: https://nodejs.org/en/download/
 :url_nodejs: https://nodejs.org/

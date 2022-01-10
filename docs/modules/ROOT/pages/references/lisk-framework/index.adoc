@@ -2,7 +2,7 @@
 Mona Bärenfänger <mona@lightcurve.io>
 :description: Covers references of the Lisk Framework, like the BaseModule, the BaseAsset and the BasePlugin.
 :toc: preamble
-:imagesdir: ../../assets/images
+:imagesdir: ../../images
 :page-no-next: true
 :page-previous: /lisk-sdk/references/lisk-elements/index.html
 :page-previous-title: Lisk Elements
