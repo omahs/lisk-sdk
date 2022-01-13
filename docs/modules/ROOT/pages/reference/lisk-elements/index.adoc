@@ -4,7 +4,7 @@ Mona Bärenfänger <mona@lightcurve.io>
 :page-aliases: lisk-elements/index.adoc, lisk-elements/packages.adoc, reference/lisk-elements/packages.adoc
 :toc: preamble
 :imagesdir: ../../../images
-:page-previous: /lisk-sdk/references/lisk-commander/index.html
+:page-previous: /lisk-sdk/reference/lisk-commander/index.html
 :page-previous-title: Lisk Commander
 :title-logo-image: image:test-logo.png[]
 // URLs
@@ -26,21 +26,21 @@ Mona Bärenfänger <mona@lightcurve.io>
 :url_npm_lisk_utils: https://www.npmjs.com/package/@liskhq/lisk-utils
 :url_npm_lisk_validator: https://www.npmjs.com/package/@liskhq/lisk-validator
 // Project URls
-:url_npm_lisk_api_docs: references/lisk-elements/api-client.adoc
-:url_npm_lisk_bft_docs: references/lisk-elements/bft.adoc
-:url_npm_lisk_chain_docs: references/lisk-elements/chain.adoc
-:url_npm_lisk_client_docs: references/lisk-elements/client.adoc
-:url_npm_lisk_codec_docs: references/lisk-elements/codec.adoc
-:url_npm_lisk_cryptography_docs: references/lisk-elements/cryptography.adoc
-:url_npm_lisk_db_docs: references/lisk-elements/db.adoc
-:url_npm_lisk_genesis_docs: references/lisk-elements/genesis.adoc
-:url_npm_lisk_p2p_docs: references/lisk-elements/p2p.adoc
-:url_npm_lisk_passphrase_docs: references/lisk-elements/passphrase.adoc
-:url_npm_lisk_transaction_pool_docs: references/lisk-elements/transaction-pool.adoc
-:url_npm_lisk_transactions_docs: references/lisk-elements/transactions.adoc
-:url_npm_lisk_tree_docs: references/lisk-elements/tree.adoc
-:url_npm_lisk_utils_docs: references/lisk-elements/utils.adoc
-:url_npm_lisk_validator_docs: references/lisk-elements/validator.adoc
+:url_npm_lisk_api_docs: reference/lisk-elements/api-client.adoc
+:url_npm_lisk_bft_docs: reference/lisk-elements/bft.adoc
+:url_npm_lisk_chain_docs: reference/lisk-elements/chain.adoc
+:url_npm_lisk_client_docs: reference/lisk-elements/client.adoc
+:url_npm_lisk_codec_docs: reference/lisk-elements/codec.adoc
+:url_npm_lisk_cryptography_docs: reference/lisk-elements/cryptography.adoc
+:url_npm_lisk_db_docs: reference/lisk-elements/db.adoc
+:url_npm_lisk_genesis_docs: reference/lisk-elements/genesis.adoc
+:url_npm_lisk_p2p_docs: reference/lisk-elements/p2p.adoc
+:url_npm_lisk_passphrase_docs: reference/lisk-elements/passphrase.adoc
+:url_npm_lisk_transaction_pool_docs: reference/lisk-elements/transaction-pool.adoc
+:url_npm_lisk_transactions_docs: reference/lisk-elements/transactions.adoc
+:url_npm_lisk_tree_docs: reference/lisk-elements/tree.adoc
+:url_npm_lisk_utils_docs: reference/lisk-elements/utils.adoc
+:url_npm_lisk_validator_docs: reference/lisk-elements/validator.adoc
 :url_npm_glossary: ROOT::glossary.adoc#npm-node-package-manager
 :url_lisk_sdk: ROOT::glossary.adoc#lisk-sdk
 

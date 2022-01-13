@@ -7,7 +7,7 @@
 :url_recaptcha_test_keys: https://developers.google.com/recaptcha/docs/faq#id-like-to-run-automated-tests-with-recaptcha.-what-should-i-do
 :url_recaptcha: https://developers.google.com/recaptcha/intro
 // Project URLs
-:url_cryptography_encrypt_pw: references/lisk-elements/cryptography.adoc#encryptpassphrasewithpassword
+:url_cryptography_encrypt_pw: reference/lisk-elements/cryptography.adoc#encryptpassphrasewithpassword
 
 `@liskhq/lisk-framework-faucet-plugin` is a plugin for the Lisk Framework that provides a user interface to receive an certain amount of tokens on request.
 The faucet plugin is a useful tool during development and also in testing networks.
@@ -238,7 +238,7 @@ useClient().then((val) => {
 ----
 {
     address: string,
-    token: string 
+    token: string
 }
 ----
 

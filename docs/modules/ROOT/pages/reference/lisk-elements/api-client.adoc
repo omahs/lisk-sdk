@@ -4,7 +4,7 @@ Mona Bärenfänger <mona@lightcurve.io>
 :page-aliases: lisk-elements/packages/api-client.adoc, reference/lisk-elements/packages/api-client.adoc
 :toc:
 // Project URLs
-:url_elements_client: references/lisk-elements/client.adoc
+:url_elements_client: reference/lisk-elements/client.adoc
 
 The Lisk Elements API Client provides a convenient wrapper for interacting with the public API of nodes on the Lisk network.
 

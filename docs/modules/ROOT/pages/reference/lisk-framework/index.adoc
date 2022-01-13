@@ -4,7 +4,7 @@ Mona Bärenfänger <mona@lightcurve.io>
 :toc: preamble
 :imagesdir: ../../images
 :page-no-next: true
-:page-previous: /lisk-sdk/references/lisk-elements/index.html
+:page-previous: /lisk-sdk/reference/lisk-elements/index.html
 :page-previous-title: Lisk Elements
 
 image:banner_framework.png[Logo]

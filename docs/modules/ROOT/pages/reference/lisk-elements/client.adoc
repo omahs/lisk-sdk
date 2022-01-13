@@ -3,15 +3,15 @@ Mona Bärenfänger <mona@lightcurve.io>
 :description: Technical references for the client package of Lisk Elements, including all sub-packages and general usage instructions.
 :page-aliases: lisk-elements/packages/client.adoc, reference/lisk-elements/packages/client.adoc
 :toc:
-:url_elements_api: references/lisk-elements/api-client.adoc
-:url_elements_constants: references/lisk-elements/constants.adoc
-:url_elements_cryptography: references/lisk-elements/cryptography.adoc
-:url_elements_passphrase: references/lisk-elements/passphrase.adoc
-:url_elements_transactions: references/lisk-elements/transactions.adoc
-:url_elements_codec: references/lisk-elements/codec.adoc
-:url_elements_utils: references/lisk-elements/utils.adoc
-:url_elements_tree: references/lisk-elements/tree.adoc
-:url_elements_validator: references/lisk-elements/validator.adoc
+:url_elements_api: reference/lisk-elements/api-client.adoc
+:url_elements_constants: reference/lisk-elements/constants.adoc
+:url_elements_cryptography: reference/lisk-elements/cryptography.adoc
+:url_elements_passphrase: reference/lisk-elements/passphrase.adoc
+:url_elements_transactions: reference/lisk-elements/transactions.adoc
+:url_elements_codec: reference/lisk-elements/codec.adoc
+:url_elements_utils: reference/lisk-elements/utils.adoc
+:url_elements_tree: reference/lisk-elements/tree.adoc
+:url_elements_validator: reference/lisk-elements/validator.adoc
 
 The @liskhq/lisk-client package provides a default set of packages for use by clients of the Lisk network.
 
