@@ -27,6 +27,9 @@ export const defaultConfig = {
 		consoleLogLevel: 'none',
 		logFileName: 'lisk.log',
 	},
+	system: {
+		keepEventsForHeights: -1,
+	},
 	genesis: {
 		blockTime: 10,
 		communityIdentifier: 'sdk',
@@ -35,7 +38,7 @@ export const defaultConfig = {
 		baseFees: [
 			{
 				moduleID: 12,
-				assetID: 0,
+				commandID: 0,
 				baseFee: '1000000000',
 			},
 		],
