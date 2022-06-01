@@ -1,0 +1,8 @@
+{
+	"entryPoints": ["framework/src/index.ts"],
+	"exclude": ["**/test/**", "**/node_modules/**"],
+	"externalPattern": ["**/node_modules/**", "**/test/**"],
+	"excludeExternals": true,
+	"theme": "default",
+	"out": "typedocs"
+}

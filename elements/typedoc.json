@@ -1,0 +1,9 @@
+{
+	"entryPoints": ["./"],
+	"entryPointStrategy": "packages",
+	"exclude": "**/node_modules/**",
+	"externalPattern": "**/node_modules/**",
+	"excludeExternals": true,
+	"theme": "default",
+	"out": "docs"
+}

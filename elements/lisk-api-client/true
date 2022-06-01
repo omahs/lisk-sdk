@@ -1,0 +1,786 @@
+{
+	"id": 0,
+	"name": "@liskhq/lisk-api-client",
+	"kind": 1,
+	"kindString": "Project",
+	"flags": {},
+	"originalName": "",
+	"children": [
+		{
+			"id": 10,
+			"name": "APIClient",
+			"kind": 128,
+			"kindString": "Class",
+			"flags": {},
+			"children": [
+				{
+					"id": 11,
+					"name": "constructor",
+					"kind": 512,
+					"kindString": "Constructor",
+					"flags": {
+						"isPublic": true
+					},
+					"sources": [
+						{
+							"fileName": "api_client.ts",
+							"line": 28,
+							"character": 1
+						}
+					],
+					"signatures": [
+						{
+							"id": 12,
+							"name": "new APIClient",
+							"kind": 16384,
+							"kindString": "Constructor signature",
+							"flags": {},
+							"parameters": [
+								{
+									"id": 13,
+									"name": "channel",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {},
+									"type": {
+										"type": "reference",
+										"name": "Channel"
+									}
+								}
+							],
+							"type": {
+								"type": "reference",
+								"id": 10,
+								"name": "APIClient"
+							}
+						}
+					]
+				},
+				{
+					"id": 18,
+					"name": "_block",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isPrivate": true
+					},
+					"sources": [
+						{
+							"fileName": "api_client.ts",
+							"line": 25,
+							"character": 9
+						}
+					],
+					"type": {
+						"type": "reference",
+						"name": "Block"
+					}
+				},
+				{
+					"id": 14,
+					"name": "_channel",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isPrivate": true,
+						"isReadonly": true
+					},
+					"sources": [
+						{
+							"fileName": "api_client.ts",
+							"line": 21,
+							"character": 18
+						}
+					],
+					"type": {
+						"type": "reference",
+						"name": "Channel"
+					}
+				},
+				{
+					"id": 17,
+					"name": "_node",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isPrivate": true
+					},
+					"sources": [
+						{
+							"fileName": "api_client.ts",
+							"line": 24,
+							"character": 9
+						}
+					],
+					"type": {
+						"type": "reference",
+						"name": "Node"
+					}
+				},
+				{
+					"id": 16,
+					"name": "_nodeInfo",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isPrivate": true
+					},
+					"sources": [
+						{
+							"fileName": "api_client.ts",
+							"line": 23,
+							"character": 9
+						}
+					],
+					"type": {
+						"type": "reference",
+						"name": "NodeInfo"
+					}
+				},
+				{
+					"id": 15,
+					"name": "_schemas",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isPrivate": true
+					},
+					"sources": [
+						{
+							"fileName": "api_client.ts",
+							"line": 22,
+							"character": 9
+						}
+					],
+					"type": {
+						"type": "reference",
+						"name": "RegisteredSchemas"
+					}
+				},
+				{
+					"id": 19,
+					"name": "_transaction",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isPrivate": true
+					},
+					"sources": [
+						{
+							"fileName": "api_client.ts",
+							"line": 26,
+							"character": 9
+						}
+					],
+					"type": {
+						"type": "reference",
+						"name": "Transaction"
+					}
+				},
+				{
+					"id": 37,
+					"name": "block",
+					"kind": 262144,
+					"kindString": "Accessor",
+					"flags": {
+						"isPublic": true
+					},
+					"sources": [
+						{
+							"fileName": "api_client.ts",
+							"line": 63,
+							"character": 12
+						}
+					],
+					"getSignature": [
+						{
+							"id": 38,
+							"name": "block",
+							"kind": 524288,
+							"kindString": "Get signature",
+							"flags": {},
+							"type": {
+								"type": "reference",
+								"name": "Block"
+							}
+						}
+					]
+				},
+				{
+					"id": 35,
+					"name": "node",
+					"kind": 262144,
+					"kindString": "Accessor",
+					"flags": {
+						"isPublic": true
+					},
+					"sources": [
+						{
+							"fileName": "api_client.ts",
+							"line": 59,
+							"character": 12
+						}
+					],
+					"getSignature": [
+						{
+							"id": 36,
+							"name": "node",
+							"kind": 524288,
+							"kindString": "Get signature",
+							"flags": {},
+							"type": {
+								"type": "reference",
+								"name": "Node"
+							}
+						}
+					]
+				},
+				{
+					"id": 33,
+					"name": "schemas",
+					"kind": 262144,
+					"kindString": "Accessor",
+					"flags": {
+						"isPublic": true
+					},
+					"sources": [
+						{
+							"fileName": "api_client.ts",
+							"line": 55,
+							"character": 12
+						}
+					],
+					"getSignature": [
+						{
+							"id": 34,
+							"name": "schemas",
+							"kind": 524288,
+							"kindString": "Get signature",
+							"flags": {},
+							"type": {
+								"type": "reference",
+								"name": "RegisteredSchemas"
+							}
+						}
+					]
+				},
+				{
+					"id": 39,
+					"name": "transaction",
+					"kind": 262144,
+					"kindString": "Accessor",
+					"flags": {
+						"isPublic": true
+					},
+					"sources": [
+						{
+							"fileName": "api_client.ts",
+							"line": 67,
+							"character": 12
+						}
+					],
+					"getSignature": [
+						{
+							"id": 40,
+							"name": "transaction",
+							"kind": 524288,
+							"kindString": "Get signature",
+							"flags": {},
+							"type": {
+								"type": "reference",
+								"name": "Transaction"
+							}
+						}
+					]
+				},
+				{
+					"id": 22,
+					"name": "disconnect",
+					"kind": 2048,
+					"kindString": "Method",
+					"flags": {
+						"isPublic": true
+					},
+					"sources": [
+						{
+							"fileName": "api_client.ts",
+							"line": 40,
+							"character": 14
+						}
+					],
+					"signatures": [
+						{
+							"id": 23,
+							"name": "disconnect",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {},
+							"type": {
+								"type": "reference",
+								"typeArguments": [
+									{
+										"type": "intrinsic",
+										"name": "void"
+									}
+								],
+								"qualifiedName": "Promise",
+								"package": "typescript",
+								"name": "Promise"
+							}
+						}
+					]
+				},
+				{
+					"id": 20,
+					"name": "init",
+					"kind": 2048,
+					"kindString": "Method",
+					"flags": {
+						"isPublic": true
+					},
+					"sources": [
+						{
+							"fileName": "api_client.ts",
+							"line": 32,
+							"character": 14
+						}
+					],
+					"signatures": [
+						{
+							"id": 21,
+							"name": "init",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {},
+							"type": {
+								"type": "reference",
+								"typeArguments": [
+									{
+										"type": "intrinsic",
+										"name": "void"
+									}
+								],
+								"qualifiedName": "Promise",
+								"package": "typescript",
+								"name": "Promise"
+							}
+						}
+					]
+				},
+				{
+					"id": 24,
+					"name": "invoke",
+					"kind": 2048,
+					"kindString": "Method",
+					"flags": {
+						"isPublic": true
+					},
+					"sources": [
+						{
+							"fileName": "api_client.ts",
+							"line": 44,
+							"character": 14
+						}
+					],
+					"signatures": [
+						{
+							"id": 25,
+							"name": "invoke",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {},
+							"typeParameter": [
+								{
+									"id": 26,
+									"name": "T",
+									"kind": 131072,
+									"kindString": "Type parameter",
+									"flags": {},
+									"default": {
+										"type": "reference",
+										"typeArguments": [
+											{
+												"type": "intrinsic",
+												"name": "string"
+											},
+											{
+												"type": "intrinsic",
+												"name": "unknown"
+											}
+										],
+										"qualifiedName": "Record",
+										"package": "typescript",
+										"name": "Record"
+									}
+								}
+							],
+							"parameters": [
+								{
+									"id": 27,
+									"name": "actionName",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {},
+									"type": {
+										"type": "intrinsic",
+										"name": "string"
+									}
+								},
+								{
+									"id": 28,
+									"name": "params",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isOptional": true
+									},
+									"type": {
+										"type": "reference",
+										"typeArguments": [
+											{
+												"type": "intrinsic",
+												"name": "string"
+											},
+											{
+												"type": "intrinsic",
+												"name": "unknown"
+											}
+										],
+										"qualifiedName": "Record",
+										"package": "typescript",
+										"name": "Record"
+									}
+								}
+							],
+							"type": {
+								"type": "reference",
+								"typeArguments": [
+									{
+										"type": "reference",
+										"id": 26,
+										"name": "T"
+									}
+								],
+								"qualifiedName": "Promise",
+								"package": "typescript",
+								"name": "Promise"
+							}
+						}
+					]
+				},
+				{
+					"id": 29,
+					"name": "subscribe",
+					"kind": 2048,
+					"kindString": "Method",
+					"flags": {
+						"isPublic": true
+					},
+					"sources": [
+						{
+							"fileName": "api_client.ts",
+							"line": 51,
+							"character": 8
+						}
+					],
+					"signatures": [
+						{
+							"id": 30,
+							"name": "subscribe",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {},
+							"parameters": [
+								{
+									"id": 31,
+									"name": "eventName",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {},
+									"type": {
+										"type": "intrinsic",
+										"name": "string"
+									}
+								},
+								{
+									"id": 32,
+									"name": "cb",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {},
+									"type": {
+										"type": "reference",
+										"typeArguments": [
+											{
+												"type": "reference",
+												"typeArguments": [
+													{
+														"type": "intrinsic",
+														"name": "string"
+													},
+													{
+														"type": "intrinsic",
+														"name": "unknown"
+													}
+												],
+												"qualifiedName": "Record",
+												"package": "typescript",
+												"name": "Record"
+											}
+										],
+										"name": "EventCallback"
+									}
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "void"
+							}
+						}
+					]
+				}
+			],
+			"groups": [
+				{
+					"title": "Constructors",
+					"kind": 512,
+					"children": [
+						11
+					]
+				},
+				{
+					"title": "Properties",
+					"kind": 1024,
+					"children": [
+						18,
+						14,
+						17,
+						16,
+						15,
+						19
+					]
+				},
+				{
+					"title": "Accessors",
+					"kind": 262144,
+					"children": [
+						37,
+						35,
+						33,
+						39
+					]
+				},
+				{
+					"title": "Methods",
+					"kind": 2048,
+					"children": [
+						22,
+						20,
+						24,
+						29
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "api_client.ts",
+					"line": 20,
+					"character": 13
+				}
+			]
+		},
+		{
+			"id": 7,
+			"name": "createClient",
+			"kind": 64,
+			"kindString": "Function",
+			"flags": {},
+			"sources": [
+				{
+					"fileName": "create_clients.ts",
+					"line": 21,
+					"character": 13
+				}
+			],
+			"signatures": [
+				{
+					"id": 8,
+					"name": "createClient",
+					"kind": 4096,
+					"kindString": "Call signature",
+					"flags": {},
+					"parameters": [
+						{
+							"id": 9,
+							"name": "channel",
+							"kind": 32768,
+							"kindString": "Parameter",
+							"flags": {},
+							"type": {
+								"type": "reference",
+								"typeArguments": [
+									{
+										"type": "reference",
+										"name": "Channel"
+									},
+									{
+										"type": "union",
+										"types": [
+											{
+												"type": "literal",
+												"value": "connect"
+											},
+											{
+												"type": "literal",
+												"value": "disconnect"
+											}
+										]
+									}
+								],
+								"qualifiedName": "Omit",
+								"package": "typescript",
+								"name": "Omit"
+							}
+						}
+					],
+					"type": {
+						"type": "reference",
+						"typeArguments": [
+							{
+								"type": "reference",
+								"id": 10,
+								"name": "APIClient"
+							}
+						],
+						"qualifiedName": "Promise",
+						"package": "typescript",
+						"name": "Promise"
+					}
+				}
+			]
+		},
+		{
+			"id": 1,
+			"name": "createIPCClient",
+			"kind": 64,
+			"kindString": "Function",
+			"flags": {},
+			"sources": [
+				{
+					"fileName": "create_clients.ts",
+					"line": 30,
+					"character": 13
+				}
+			],
+			"signatures": [
+				{
+					"id": 2,
+					"name": "createIPCClient",
+					"kind": 4096,
+					"kindString": "Call signature",
+					"flags": {},
+					"parameters": [
+						{
+							"id": 3,
+							"name": "dataPath",
+							"kind": 32768,
+							"kindString": "Parameter",
+							"flags": {},
+							"type": {
+								"type": "intrinsic",
+								"name": "string"
+							}
+						}
+					],
+					"type": {
+						"type": "reference",
+						"typeArguments": [
+							{
+								"type": "reference",
+								"id": 10,
+								"name": "APIClient"
+							}
+						],
+						"qualifiedName": "Promise",
+						"package": "typescript",
+						"name": "Promise"
+					}
+				}
+			]
+		},
+		{
+			"id": 4,
+			"name": "createWSClient",
+			"kind": 64,
+			"kindString": "Function",
+			"flags": {},
+			"sources": [
+				{
+					"fileName": "create_clients.ts",
+					"line": 37,
+					"character": 13
+				}
+			],
+			"signatures": [
+				{
+					"id": 5,
+					"name": "createWSClient",
+					"kind": 4096,
+					"kindString": "Call signature",
+					"flags": {},
+					"parameters": [
+						{
+							"id": 6,
+							"name": "url",
+							"kind": 32768,
+							"kindString": "Parameter",
+							"flags": {},
+							"type": {
+								"type": "intrinsic",
+								"name": "string"
+							}
+						}
+					],
+					"type": {
+						"type": "reference",
+						"typeArguments": [
+							{
+								"type": "reference",
+								"id": 10,
+								"name": "APIClient"
+							}
+						],
+						"qualifiedName": "Promise",
+						"package": "typescript",
+						"name": "Promise"
+					}
+				}
+			]
+		}
+	],
+	"groups": [
+		{
+			"title": "Classes",
+			"kind": 128,
+			"children": [
+				10
+			]
+		},
+		{
+			"title": "Functions",
+			"kind": 64,
+			"children": [
+				7,
+				1,
+				4
+			]
+		}
+	],
+	"sources": [
+		{
+			"fileName": "index.ts",
+			"line": 16,
+			"character": 0
+		}
+	]
+}
