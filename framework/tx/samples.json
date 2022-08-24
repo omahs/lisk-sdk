@@ -308,7 +308,7 @@
 				"senderPublicKey": "bfbef2a36e17ca75b66fd56adea8dd04ed234cd4188aca42fc8a7299d8eaadd8",
 				"params": {
 					"name": "sideKick",
-					"genesisBlockID": "b332bc36bc17dcc6bc22149eac93c7b85dfc02cbb3d72ea0dccaf1b346790ab9",
+					"chainID": "00030001",
 					"initValidators": [
 						{
 							"blsKey": "b3580baa0e11ea8eec105087fec67bcf459100ac5e5c5996332d0ef4787055531e69b9efc489aabf86541fb0a105df75",
@@ -319,7 +319,8 @@
 							"bftWeight": "40"
 						}
 					],
-					"certificateThreshold": 40
+					"certificateThreshold": 40,
+					"sidechainRegistrationFee": "1000000000"
 				},
 				"signatures": []
 			},
