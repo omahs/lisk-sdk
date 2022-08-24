@@ -10,42 +10,9 @@
 				"senderPublicKey": "bfbef2a36e17ca75b66fd56adea8dd04ed234cd4188aca42fc8a7299d8eaadd8",
 				"params": {
 					"tokenID": "0000000200000001",
-					"amount": "1230000001234",
-					"recipientAddress": "00b1182b317a82e4b9c4a54119ced29f19b496de",
-					"data": ""
-				},
-				"signatures": []
-			},
-			"summaryKeys": [
-				"module",
-				"command",
-				"fee",
-				"params.tokenID",
-				"params.amount",
-				"params.recipientAddress"
-			],
-			"detailKeys": [
-				"module",
-				"command",
-				"fee",
-				"nonce",
-				"params.tokenID",
-				"params.amount",
-				"params.recipientAddress",
-				"params.data"
-			]
-		},
-		{
-			"unsignedTransaction": {
-				"module": "token",
-				"command": "transfer",
-				"nonce": "2",
-				"fee": "12345678910",
-				"senderPublicKey": "bfbef2a36e17ca75b66fd56adea8dd04ed234cd4188aca42fc8a7299d8eaadd8",
-				"params": {
-					"tokenID": "0000000200000001",
 					"amount": "18446744073709551615",
 					"recipientAddress": "00b1182b317a82e4b9c4a54119ced29f19b496de",
+					"accountInitializationFee": "5000000",
 					"data": "we have some information is here"
 				},
 				"signatures": []
@@ -56,6 +23,7 @@
 				"fee",
 				"params.tokenID",
 				"params.amount",
+				"params.accountInitializationFee",
 				"params.recipientAddress"
 			],
 			"detailKeys": [
@@ -66,6 +34,7 @@
 				"params.tokenID",
 				"params.amount",
 				"params.recipientAddress",
+				"params.accountInitializationFee",
 				"params.data"
 			]
 		},
@@ -82,6 +51,7 @@
 					"receivingChainID": "00000002",
 					"recipientAddress": "00b1182b317a82e4b9c4a54119ced29f19b496de",
 					"messageFee": "50000000",
+					"escrowInitializationFee": "5000000",
 					"data": "we have some information is here"
 				},
 				"signatures": []
@@ -93,6 +63,7 @@
 				"params.tokenID",
 				"params.amount",
 				"params.recipientAddress",
+				"params.escrowInitializationFee",
 				"params.receivingChainID"
 			],
 			"detailKeys": [
@@ -104,6 +75,7 @@
 				"params.recipientAddress",
 				"params.receivingChainID",
 				"params.messageFee",
+				"params.escrowInitializationFee",
 				"params.data"
 			]
 		},
@@ -158,7 +130,8 @@
 					"name": "delegate_1",
 					"blsKey": "b3580baa0e11ea8eec105087fec67bcf459100ac5e5c5996332d0ef4787055531e69b9efc489aabf86541fb0a105df75",
 					"proofOfPossession": "2fa181a001d0e76e059b05a08717f32dfb3c6aaf6f6033a0c058001034aebd6c",
-					"generatorKey": "fe89ca03b79c10fdc856ab63c8375126fb3830f076afaea4b9143b2eb032a9e2"
+					"generatorKey": "fe89ca03b79c10fdc856ab63c8375126fb3830f076afaea4b9143b2eb032a9e2",
+					"delegateRegistrationFee": "1000000000"
 				},
 				"signatures": []
 			},
@@ -403,6 +376,45 @@
 			},
 			"summaryKeys": ["module", "command", "fee", "params.chainID", "params.module"],
 			"detailKeys": ["module", "command", "fee", "params.chainID", "params.module"]
+		},
+		{
+			"unsignedTransaction": {
+				"module": "legacy",
+				"command": "reclaimLSK",
+				"nonce": "2",
+				"fee": "12345678910",
+				"senderPublicKey": "bfbef2a36e17ca75b66fd56adea8dd04ed234cd4188aca42fc8a7299d8eaadd8",
+				"params": {
+					"amount": "24500000000"
+				},
+				"signatures": []
+			},
+			"summaryKeys": ["module", "command", "fee", "params.amount"],
+			"detailKeys": ["module", "command", "fee", "params.amount"]
+		},
+		{
+			"unsignedTransaction": {
+				"module": "legacy",
+				"command": "registerKeys",
+				"nonce": "2",
+				"fee": "12345678910",
+				"senderPublicKey": "bfbef2a36e17ca75b66fd56adea8dd04ed234cd4188aca42fc8a7299d8eaadd8",
+				"params": {
+					"blsKey": "b3580baa0e11ea8eec105087fec67bcf459100ac5e5c5996332d0ef4787055531e69b9efc489aabf86541fb0a105df75",
+					"proofOfPossession": "2fa181a001d0e76e059b05a08717f32dfb3c6aaf6f6033a0c058001034aebd6c",
+					"generatorKey": "fe89ca03b79c10fdc856ab63c8375126fb3830f076afaea4b9143b2eb032a9e2"
+				},
+				"signatures": []
+			},
+			"summaryKeys": ["module", "command", "fee"],
+			"detailKeys": [
+				"module",
+				"command",
+				"fee",
+				"params.generatorKey",
+				"params.blsKey",
+				"params.proofOfPossession"
+			]
 		}
 	]
 }
