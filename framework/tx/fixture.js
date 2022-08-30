@@ -60,6 +60,35 @@ const insertInteropsCommands = metadata => {
 			name: 'messageRecovery',
 			params: messageRecoveryParamsSchema,
 		},
+		{
+			name: 'messageRecoveryInitialization',
+			params: {
+				$id: 'lisk/interoperability/messageRecoveryInitialization',
+				type: 'object',
+				required: ['chainID', 'channel', 'bitmap', 'siblingHashes'],
+				properties: {
+					chainID: {
+						dataType: 'bytes',
+						fieldNumber: 1,
+					},
+					channel: {
+						dataType: 'bytes',
+						fieldNumber: 2,
+					},
+					bitmap: {
+						dataType: 'bytes',
+						fieldNumber: 3,
+					},
+					siblingHashes: {
+						type: 'array',
+						items: {
+							dataType: 'bytes',
+						},
+						fieldNumber: 4,
+					},
+				},
+			},
+		},
 	];
 };
 

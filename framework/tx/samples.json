@@ -303,6 +303,28 @@
 		{
 			"unsignedTransaction": {
 				"module": "interoperability",
+				"command": "messageRecoveryInitialization",
+				"nonce": "2",
+				"fee": "12345678910",
+				"senderPublicKey": "bfbef2a36e17ca75b66fd56adea8dd04ed234cd4188aca42fc8a7299d8eaadd8",
+				"params": {
+					"chainID": "00030001",
+					"channel": "9be9c7a546528407a0510d4b004db629b6180433f6f56a36e87c64b0d76f689602bf66c6d3e6759d",
+					"bitmap": "00010f",
+					"siblingHashes": [
+						"7eb6ca85aa67f660876eddf786683ba89bdbb9abfe9a0d38e05e057207f35b71",
+						"ecad1b56984960d3c85358f50321fdfb81a0e160180c1c56c514f48b3f67fa56",
+						"73f75c695ca253c1638b7cf4a1388732463350013edacdf5d04f7e95497045d1"
+					]
+				},
+				"signatures": []
+			},
+			"summaryKeys": ["module", "command", "fee", "params.chainID"],
+			"detailKeys": ["module", "command", "fee", "params.chainID"]
+		},
+		{
+			"unsignedTransaction": {
+				"module": "interoperability",
 				"command": "sidechainRegistration",
 				"nonce": "2",
 				"fee": "12345678910",
