@@ -243,8 +243,8 @@
 				},
 				"signatures": []
 			},
-			"summaryKeys": ["module", "command", "fee", "sidechainID"],
-			"detailKeys": ["module", "command", "fee", "sidechainID"]
+			"summaryKeys": ["module", "command", "fee", "params.sidechainID"],
+			"detailKeys": ["module", "command", "fee", "params.sidechainID"]
 		},
 		{
 			"unsignedTransaction": {
@@ -271,8 +271,8 @@
 				},
 				"signatures": []
 			},
-			"summaryKeys": ["module", "command", "fee", "ownChainID", "ownName"],
-			"detailKeys": ["module", "command", "fee", "ownChainID", "ownName"]
+			"summaryKeys": ["module", "command", "fee", "params.ownChainID", "params.ownName"],
+			"detailKeys": ["module", "command", "fee", "params.ownChainID", "params.ownName"]
 		},
 		{
 			"unsignedTransaction": {
@@ -297,8 +297,8 @@
 				},
 				"signatures": []
 			},
-			"summaryKeys": ["module", "command", "fee", "chainID"],
-			"detailKeys": ["module", "command", "fee", "chainID"]
+			"summaryKeys": ["module", "command", "fee", "params.chainID"],
+			"detailKeys": ["module", "command", "fee", "params.chainID"]
 		},
 		{
 			"unsignedTransaction": {
@@ -326,7 +326,7 @@
 				"signatures": []
 			},
 			"summaryKeys": ["module", "command", "fee", "params.name"],
-			"detailKeys": ["module", "command", "fee", "params.name", "params.genesisBlockID"]
+			"detailKeys": ["module", "command", "fee", "params.name", "params.chainID"]
 		},
 		{
 			"unsignedTransaction": {

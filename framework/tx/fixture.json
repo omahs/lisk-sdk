@@ -148,13 +148,13 @@
 				"0 | module : interoperability",
 				"1 | command : sidechainCCUpdate",
 				"2 | fee : 12345678910",
-				"3 | sidechainID : undefined"
+				"3 | sidechainID : 00000002"
 			],
 			"output_expert": [
 				"0 | module : interoperability",
 				"1 | command : sidechainCCUpdate",
 				"2 | fee : 12345678910",
-				"3 | sidechainID : undefined"
+				"3 | sidechainID : 00000002"
 			],
 			"signature": "e78481d07c9fc6f871ab3d4c8cf2d551d8fef463caa9df4f3bd09b13da1282f27047a8f2de39ba0b1f99b37acbeaad0377175b9d42e819590f19a062babb2903"
 		},
@@ -166,15 +166,15 @@
 				"0 | module : interoperability",
 				"1 | command : mainchainRegistration",
 				"2 | fee : 12345678910",
-				"3 | ownChainID : undefined",
-				"4 | ownName : undefined"
+				"3 | ownChainID : 00030001",
+				"4 | ownName : sidekick"
 			],
 			"output_expert": [
 				"0 | module : interoperability",
 				"1 | command : mainchainRegistration",
 				"2 | fee : 12345678910",
-				"3 | ownChainID : undefined",
-				"4 | ownName : undefined"
+				"3 | ownChainID : 00030001",
+				"4 | ownName : sidekick"
 			],
 			"signature": "db57f9df1f7c59ce9a7d76a5b88df7e528b25db092e122b93acaebfbbabef791908c7d17d59467f849e5aa49be0d53b47d7bca4cb30471bae7abbbe891160c0c"
 		},
@@ -186,13 +186,13 @@
 				"0 | module : interoperability",
 				"1 | command : messageRecovery",
 				"2 | fee : 12345678910",
-				"3 | chainID : undefined"
+				"3 | chainID : 00030001"
 			],
 			"output_expert": [
 				"0 | module : interoperability",
 				"1 | command : messageRecovery",
 				"2 | fee : 12345678910",
-				"3 | chainID : undefined"
+				"3 | chainID : 00030001"
 			],
 			"signature": "2f9c3412f6d8683cb8d4975299a69c7139b99ffdb3b806f8b334359fea70a27949f2c80b00d24bd77f80e730087fe804f9a85f28100604c5edfcda298bb5950c"
 		},
@@ -211,7 +211,7 @@
 				"1 | command : sidechainRegistration",
 				"2 | fee : 12345678910",
 				"3 | name : sideKick",
-				"4 | genesisBlockID : undefined"
+				"4 | chainID : 00030001"
 			],
 			"signature": "206c9bacb987e30de6041b7987082e6b8b9831c94cf732157b23b8088846ea5996ccab08c81780fb773db6547fa2773f9cf8d1e971c45f76706edb5ba8669a0f"
 		},
