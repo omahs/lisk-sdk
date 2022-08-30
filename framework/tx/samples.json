@@ -1,4 +1,5 @@
 {
+	"chainID": "00000000",
 	"privateKey": "fde63a2a291675ed4fe88b79f30bc76f1b9352217ca6936200029c7ad29595d0bfbef2a36e17ca75b66fd56adea8dd04ed234cd4188aca42fc8a7299d8eaadd8",
 	"data": [
 		{
@@ -359,7 +360,7 @@
 				"params": {
 					"chainID": "00030001",
 					"module": "token",
-					"storeEntry": [
+					"storeEntries": [
 						{
 							"storePrefix": "2f01",
 							"storeKey": "f9ddfa7cb410760904ad0c85936a3c0cdb0d4b59",
