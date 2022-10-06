@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { codec } = require('@liskhq/lisk-codec');
+const { convertBeddowsToLSK } = require('@liskhq/lisk-transactions');
 const fixture = require('./samples.json');
 const { Application } = require('../dist-node');
 const { transactionSchema, TAG_TRANSACTION } = require('@liskhq/lisk-chain');
@@ -136,7 +137,21 @@ const insertLegacyCommands = metadata => {
 	});
 };
 
-const formatOutput = (index, title, value) => `${index} | ${title} : ${value}`;
+const formatOutput = (index, title, value) =>
+	`${index} | ${capital(title)} : ${formatLSK(title, value)}`;
+
+const capital = title => {
+	return title.charAt(0).toUpperCase() + title.slice(1);
+};
+
+const formatLSK = (title, value) => {
+	if (!['amount', 'fee'].includes(title)) {
+		return value;
+	}
+	const lsk = convertBeddowsToLSK(value);
+
+	return `LSK ${lsk}`;
+};
 
 const getNested = (obj, key) => {
 	const splitKeys = key.split('.');
@@ -155,6 +170,7 @@ const getNested = (obj, key) => {
 	const { app } = Application.defaultApplication();
 	const privateKey = Buffer.from(fixture.privateKey, 'hex');
 	const metadata = app.getMetadata();
+	console.log(JSON.stringify(metadata, undefined, '  '));
 	insertInteropsCommands(metadata);
 	insertLegacyCommands(metadata);
 	const result = [];

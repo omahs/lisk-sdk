@@ -12,7 +12,7 @@
 				"params": {
 					"tokenID": "0000000200000001",
 					"amount": "18446744073709551615",
-					"recipientAddress": "00b1182b317a82e4b9c4a54119ced29f19b496de",
+					"recipientAddress": "lskzv2yu6ay86x7477pkqzyttertjos4mef7zvoao",
 					"accountInitializationFee": "5000000",
 					"data": "we have some information is here"
 				},
@@ -50,7 +50,7 @@
 					"tokenID": "0000000200000001",
 					"amount": "18446744073709551615",
 					"receivingChainID": "00000002",
-					"recipientAddress": "00b1182b317a82e4b9c4a54119ced29f19b496de",
+					"recipientAddress": "lskzv2yu6ay86x7477pkqzyttertjos4mef7zvoao",
 					"messageFee": "50000000",
 					"escrowInitializationFee": "5000000",
 					"data": "we have some information is here"
@@ -157,11 +157,11 @@
 				"params": {
 					"votes": [
 						{
-							"delegateAddress": "00b1182b317a82e4b9c4a54119ced29f19b496de",
+							"delegateAddress": "lskzv2yu6ay86x7477pkqzyttertjos4mef7zvoao",
 							"amount": "250000000000"
 						},
 						{
-							"delegateAddress": "55b5429d1c1890adfd20fe398d1996458006d5c4",
+							"delegateAddress": "lsk6edkmn3jcv36sg4zg2j2dboe3ezz9q7p5ne9zt",
 							"amount": "50000000000"
 						}
 					]
