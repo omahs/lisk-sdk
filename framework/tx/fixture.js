@@ -2,11 +2,10 @@ const fs = require('fs');
 const path = require('path');
 const { codec } = require('@liskhq/lisk-codec');
 const { convertBeddowsToLSK } = require('@liskhq/lisk-transactions');
-const fixture = require('./samples.json');
+const fixture = require('./tx_samples.json');
 const { Application } = require('../dist-node');
 const { transactionSchema, TAG_TRANSACTION } = require('@liskhq/lisk-chain');
 const {
-	crossChainUpdateTransactionParams,
 	mainchainRegParams,
 	sidechainRegParams,
 	stateRecoveryParamsSchema,
@@ -25,6 +24,83 @@ const getParamsSchema = (metadata, module, command) => {
 		throw new Error(`${command} not found in metadata`);
 	}
 	return com.params;
+};
+
+const crossChainUpdateTransactionParams = {
+	$id: '/modules/interoperability/ccu',
+	type: 'object',
+	required: [
+		'sendingChainID',
+		'certificate',
+		'activeValidatorsUpdate',
+		'certificateThreshold',
+		'inboxUpdate',
+	],
+	properties: {
+		sendingChainID: {
+			dataType: 'bytes',
+			fieldNumber: 1,
+		},
+		certificate: {
+			dataType: 'bytes',
+			fieldNumber: 2,
+		},
+		activeValidatorsUpdate: {
+			type: 'array',
+			fieldNumber: 3,
+			items: {
+				type: 'object',
+				required: ['blsKey', 'bftWeight'],
+				properties: {
+					blsKey: {
+						dataType: 'bytes',
+						fieldNumber: 1,
+					},
+					bftWeight: {
+						dataType: 'uint64',
+						fieldNumber: 2,
+					},
+				},
+			},
+		},
+		certificateThreshold: {
+			dataType: 'uint64',
+			fieldNumber: 4,
+		},
+		inboxUpdate: {
+			type: 'object',
+			fieldNumber: 5,
+			required: ['crossChainMessages', 'messageWitnessHashes', 'outboxRootWitness'],
+			properties: {
+				crossChainMessages: {
+					type: 'array',
+					fieldNumber: 1,
+					items: { dataType: 'bytes' },
+				},
+				messageWitnessHashes: {
+					type: 'array',
+					fieldNumber: 2,
+					items: { dataType: 'bytes' },
+				},
+				outboxRootWitness: {
+					type: 'object',
+					fieldNumber: 3,
+					required: ['bitmap', 'siblingHashes'],
+					properties: {
+						bitmap: {
+							dataType: 'bytes',
+							fieldNumber: 1,
+						},
+						siblingHashes: {
+							type: 'array',
+							fieldNumber: 2,
+							items: { dataType: 'bytes' },
+						},
+					},
+				},
+			},
+		},
+	},
 };
 
 const insertInteropsCommands = metadata => {
