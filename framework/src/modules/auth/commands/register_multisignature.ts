@@ -33,10 +33,6 @@ import { MultisignatureRegistrationEvent } from '../events/multisignature_regist
 export class RegisterMultisignatureCommand extends BaseCommand {
 	public schema = registerMultisignatureParamsSchema;
 
-	public get name(): string {
-		return 'registerMultisignatureGroup';
-	}
-
 	// eslint-disable-next-line @typescript-eslint/require-await
 	public async verify(
 		context: CommandVerifyContext<RegisterMultisignatureParams>,

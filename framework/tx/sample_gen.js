@@ -144,7 +144,7 @@ const createRegisterMultisignatureGroup = () => {
 	return {
 		unsignedTransaction: {
 			module: 'auth',
-			command: 'registerMultisignatureGroup',
+			command: 'registerMultisignature',
 			nonce: randomUInt64().toString(),
 			fee: randomUInt64().toString(),
 			senderPublicKey: publicKey,
@@ -158,7 +158,7 @@ const createRegisterMultisignatureGroup = () => {
 					.map(() => utils.getRandomBytes(32).toString('hex')),
 				signatures: new Array(numMandatory + numOptional)
 					.fill(0)
-					.map(() => utils.getRandomBytes(32).toString('hex')),
+					.map(() => utils.getRandomBytes(64).toString('hex')),
 			},
 			signatures: [],
 		},
@@ -189,7 +189,7 @@ const createRegisterDelegate = () => ({
 		params: {
 			name: randomWord(),
 			blsKey: utils.getRandomBytes(48).toString('hex'),
-			proofOfPossession: utils.getRandomBytes(32).toString('hex'),
+			proofOfPossession: utils.getRandomBytes(96).toString('hex'),
 			generatorKey: utils.getRandomBytes(32).toString('hex'),
 			delegateRegistrationFee: randomUInt64().toString(),
 		},
@@ -268,7 +268,7 @@ const sidechainCCUpdateKey = {
 const createCCUpdate = chain => ({
 	unsignedTransaction: {
 		module: 'interoperability',
-		command: `${chain}CCUpdate`,
+		command: `${chain}CrossChainUpdate`,
 		nonce: randomUInt64().toString(),
 		fee: randomUInt64().toString(),
 		senderPublicKey: publicKey,
@@ -319,7 +319,7 @@ const createMainchainRegistration = () => ({
 				blsKey: utils.getRandomBytes(48).toString('hex'),
 				bftWeight: randomNumber(103).toString(),
 			})),
-			signature: utils.getRandomBytes(64).toString('hex'),
+			signature: utils.getRandomBytes(96).toString('hex'),
 			aggregationBits: utils.getRandomBytes(randomNumber(8)).toString('hex'),
 		},
 		signatures: [],
@@ -448,7 +448,7 @@ const createStateRecovery = () => ({
 		senderPublicKey: publicKey,
 		params: {
 			chainID: utils.getRandomBytes(4).toString('hex'),
-			module: randomWord(),
+			module: utils.getRandomBytes(4).toString('hex'),
 			storeEntries: new Array(randomNumber(16)).fill(0).map(() => ({
 				storePrefix: utils.getRandomBytes(2).toString('hex'),
 				storeKey: utils.getRandomBytes(randomNumber(50)).toString('hex'),
@@ -499,13 +499,13 @@ const registerKeysKey = {
 const createRegisterKeys = () => ({
 	unsignedTransaction: {
 		module: 'legacy',
-		command: 'reclaimLSK',
+		command: 'registerKeys',
 		nonce: randomUInt64().toString(),
 		fee: randomUInt64().toString(),
 		senderPublicKey: publicKey,
 		params: {
 			blsKey: utils.getRandomBytes(48).toString('hex'),
-			proofOfPossession: utils.getRandomBytes(32).toString('hex'),
+			proofOfPossession: utils.getRandomBytes(96).toString('hex'),
 			generatorKey: utils.getRandomBytes(32).toString('hex'),
 		},
 		signatures: [],
