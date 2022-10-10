@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const { codec } = require('@liskhq/lisk-codec');
 const { convertBeddowsToLSK } = require('@liskhq/lisk-transactions');
-const fixture = require('./tx_samples.json');
+const fixture = require('./tx_samples_big.json');
 const { Application } = require('../dist-node');
 const { transactionSchema, TAG_TRANSACTION } = require('@liskhq/lisk-chain');
 const {
@@ -19,7 +19,7 @@ const getParamsSchema = (metadata, module, command) => {
 	if (!mod) {
 		throw new Error(`${module} not found in metadata`);
 	}
-	const com = mod.commands.find(c => c.name === command);
+	const com = mod.commands.find(c => mapName(c.name) === command);
 	if (!com) {
 		throw new Error(`${command} not found in metadata`);
 	}
@@ -110,35 +110,35 @@ const insertInteropsCommands = metadata => {
 	}
 	mod.commands = [
 		{
-			name: 'mainchainCCUpdate',
+			name: 'submitMainchainCrossChainUpdate',
 			params: crossChainUpdateTransactionParams,
 		},
 		{
-			name: 'sidechainCCUpdate',
+			name: 'submitSidechainCrossChainUpdate',
 			params: crossChainUpdateTransactionParams,
 		},
 		{
-			name: 'mainchainRegistration',
+			name: 'registerMainchain',
 			params: mainchainRegParams,
 		},
 		{
-			name: 'sidechainRegistration',
+			name: 'registerSidechain',
 			params: sidechainRegParams,
 		},
 		{
-			name: 'stateRecovery',
+			name: 'recoverState',
 			params: stateRecoveryParamsSchema,
 		},
 		{
-			name: 'stateRecoveryInitialization',
+			name: 'initializeStateRecovery',
 			params: stateRecoveryInitParams,
 		},
 		{
-			name: 'messageRecovery',
+			name: 'recoverMessage',
 			params: messageRecoveryParamsSchema,
 		},
 		{
-			name: 'messageRecoveryInitialization',
+			name: 'initializeMessageRecovery',
 			params: {
 				$id: 'lisk/interoperability/messageRecoveryInitialization',
 				type: 'object',
@@ -227,6 +227,22 @@ const formatLSK = (title, value) => {
 	const lsk = convertBeddowsToLSK(value);
 
 	return `LSK ${lsk}`;
+};
+
+const mapName = (original) => {
+	switch (original) {
+		case 'crossChainTransfer':
+			return 'transferCrossChain';
+		case 'voteDelegate':
+			return 'vote';
+		case 'registerMultisignatureGroup':
+			return 'registerMultisignature';
+		case 'reportDelegateMisbehavior':
+			return 'reportMisbehavior';
+		default:
+			return original;
+	}
+
 };
 
 const getNested = (obj, key) => {

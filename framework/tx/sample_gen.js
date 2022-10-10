@@ -100,7 +100,7 @@ const crossChainTransferKeys = {
 const createCrossChainTokenTransfer = () => ({
 	unsignedTransaction: {
 		module: 'token',
-		command: 'crossChainTransfer',
+		command: 'transferCrossChain',
 		nonce: randomUInt64().toString(),
 		fee: randomUInt64().toString(),
 		senderPublicKey: publicKey,
@@ -206,7 +206,7 @@ const voteDelegateKey = {
 const createVoteDelegate = () => ({
 	unsignedTransaction: {
 		module: 'dpos',
-		command: 'voteDelegate',
+		command: 'vote',
 		nonce: randomUInt64().toString(),
 		fee: randomUInt64().toString(),
 		senderPublicKey: publicKey,
@@ -247,7 +247,7 @@ const reportDelegateMisbehaviorKey = {
 const createReportDelegateMisbehavior = () => ({
 	unsignedTransaction: {
 		module: 'dpos',
-		command: 'reportDelegateMisbehavior',
+		command: 'reportMisbehavior',
 		nonce: randomUInt64().toString(),
 		fee: randomUInt64().toString(),
 		senderPublicKey: publicKey,
@@ -268,7 +268,7 @@ const sidechainCCUpdateKey = {
 const createCCUpdate = chain => ({
 	unsignedTransaction: {
 		module: 'interoperability',
-		command: `${chain}CrossChainUpdate`,
+		command: `submit${chain}CrossChainUpdate`,
 		nonce: randomUInt64().toString(),
 		fee: randomUInt64().toString(),
 		senderPublicKey: publicKey,
@@ -308,7 +308,7 @@ const mainchainRegistrationKey = {
 const createMainchainRegistration = () => ({
 	unsignedTransaction: {
 		module: 'interoperability',
-		command: 'mainchainRegistration',
+		command: 'registerMainchain',
 		nonce: randomUInt64().toString(),
 		fee: randomUInt64().toString(),
 		senderPublicKey: publicKey,
@@ -335,7 +335,7 @@ const messageRecoveryKey = {
 const createMessageRecovery = () => ({
 	unsignedTransaction: {
 		module: 'interoperability',
-		command: 'messageRecovery',
+		command: 'recoverMessage',
 		nonce: randomUInt64().toString(),
 		fee: randomUInt64().toString(),
 		senderPublicKey: publicKey,
@@ -365,7 +365,7 @@ const messageRecoveryInitializationKey = {
 const createMessageRecoveryInitialization = () => ({
 	unsignedTransaction: {
 		module: 'interoperability',
-		command: 'messageRecoveryInitialization',
+		command: 'initializeMessageRecovery',
 		nonce: randomUInt64().toString(),
 		fee: randomUInt64().toString(),
 		senderPublicKey: publicKey,
@@ -390,7 +390,7 @@ const sidechainRegistrationKey = {
 const createSidechainRegistration = () => ({
 	unsignedTransaction: {
 		module: 'interoperability',
-		command: 'sidechainRegistration',
+		command: 'registerSidechain',
 		nonce: randomUInt64().toString(),
 		fee: randomUInt64().toString(),
 		senderPublicKey: publicKey,
@@ -417,7 +417,7 @@ const stateRecoveryInitializationKey = {
 const createStateRecoveryInitialization = () => ({
 	unsignedTransaction: {
 		module: 'interoperability',
-		command: 'stateRecoveryInitialization',
+		command: 'initializeStateRecovery',
 		nonce: randomUInt64().toString(),
 		fee: randomUInt64().toString(),
 		senderPublicKey: publicKey,
@@ -442,7 +442,7 @@ const stateRecoveryKey = {
 const createStateRecovery = () => ({
 	unsignedTransaction: {
 		module: 'interoperability',
-		command: 'stateRecovery',
+		command: 'recoverState',
 		nonce: randomUInt64().toString(),
 		fee: randomUInt64().toString(),
 		senderPublicKey: publicKey,
@@ -522,8 +522,8 @@ const createData = count => {
 	data.push(...new Array(count).fill(0).map(() => createVoteDelegate()));
 	data.push(...new Array(count).fill(0).map(() => createUnlock()));
 	data.push(...new Array(count).fill(0).map(() => createReportDelegateMisbehavior()));
-	data.push(...new Array(count).fill(0).map(() => createCCUpdate('mainchain')));
-	data.push(...new Array(count).fill(0).map(() => createCCUpdate('sidechain')));
+	data.push(...new Array(count).fill(0).map(() => createCCUpdate('Mainchain')));
+	data.push(...new Array(count).fill(0).map(() => createCCUpdate('Sidechain')));
 	data.push(...new Array(count).fill(0).map(() => createMainchainRegistration()));
 	data.push(...new Array(count).fill(0).map(() => createMessageRecovery()));
 	data.push(...new Array(count).fill(0).map(() => createMessageRecoveryInitialization()));
