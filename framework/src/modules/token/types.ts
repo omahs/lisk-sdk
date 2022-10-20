@@ -23,6 +23,10 @@ export interface ModuleConfig {
 		amount: string;
 	}[];
 	supportedTokenIDs: string[];
+	initializationFees: {
+		userAccount: string;
+		escrowAccount: string;
+	};
 }
 
 export interface MinBalance {

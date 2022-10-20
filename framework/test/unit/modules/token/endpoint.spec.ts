@@ -23,6 +23,7 @@ import { AvailableLocalIDStore } from '../../../../src/modules/token/stores/avai
 import { EscrowStore } from '../../../../src/modules/token/stores/escrow';
 import { SupplyStore } from '../../../../src/modules/token/stores/supply';
 import { UserStore } from '../../../../src/modules/token/stores/user';
+import { ModuleConfig } from '../../../../src/modules/token/types';
 import { MethodContext } from '../../../../src/state_machine';
 import { PrefixedStateReadWriter } from '../../../../src/state_machine/prefixed_state_read_writer';
 import {
@@ -30,7 +31,6 @@ import {
 	createTransientModuleEndpointContext,
 } from '../../../../src/testing';
 import { InMemoryPrefixedStateDB } from '../../../../src/testing/in_memory_prefixed_state';
-import { DEFAULT_TOKEN_ID } from '../../../utils/mocks/transaction';
 
 describe('token endpoint', () => {
 	const tokenModule = new TokenModule();
@@ -49,7 +49,20 @@ describe('token endpoint', () => {
 	};
 	const defaultTotalSupply = BigInt('100000000000000');
 	const defaultEscrowAmount = BigInt('100000000000');
-	const supportedTokenIDs = ['0000000000000000', '0000000200000000'];
+
+	const config: ModuleConfig = {
+		minBalances: [
+			{
+				tokenID: '0000000000000000',
+				amount: '5000000',
+			},
+		],
+		supportedTokenIDs: ['0000000000000000', '0000000200000000'],
+		initializationFees: {
+			userAccount: '20000000',
+			escrowAccount: '20000000',
+		},
+	};
 
 	let endpoint: TokenEndpoint;
 	let stateStore: PrefixedStateReadWriter;
@@ -61,8 +74,8 @@ describe('token endpoint', () => {
 		method.init({
 			minBalances: [
 				{
-					tokenID: DEFAULT_TOKEN_ID,
-					amount: BigInt(5000000),
+					tokenID: Buffer.from(config.minBalances[0].tokenID, 'hex'),
+					amount: BigInt(config.minBalances[0].amount),
 				},
 			],
 		});
@@ -73,7 +86,7 @@ describe('token endpoint', () => {
 			terminateChain: jest.fn(),
 			getChannel: jest.fn(),
 		} as never);
-		endpoint.init(method, supportedTokenIDs);
+		endpoint.init(method, config);
 		stateStore = new PrefixedStateReadWriter(new InMemoryPrefixedStateDB());
 		methodContext = createTransientMethodContext({ stateStore });
 		const userStore = tokenModule.stores.get(UserStore);
@@ -259,7 +272,7 @@ describe('token endpoint', () => {
 			});
 			const resp = await endpoint.getSupportedTokens(moduleEndpointContext);
 			expect(resp).toEqual({
-				tokenIDs: supportedTokenIDs,
+				tokenIDs: config.supportedTokenIDs,
 			});
 		});
 	});
@@ -279,6 +292,36 @@ describe('token endpoint', () => {
 					},
 				],
 			});
+		});
+	});
+
+	describe('getInitializationFees', () => {
+		it('should return initialization fees', () => {
+			const moduleEndpointContext = createTransientModuleEndpointContext({ stateStore });
+
+			expect(endpoint.getInitializationFees(moduleEndpointContext)).toEqual(
+				config.initializationFees,
+			);
+		});
+	});
+
+	describe('isSupported', () => {
+		it('should return true for a supported token', () => {
+			const moduleEndpointContext = createTransientModuleEndpointContext({
+				stateStore,
+				params: { tokenID: config.supportedTokenIDs[0] },
+			});
+
+			expect(endpoint.isSupported(moduleEndpointContext)).toEqual({ supported: true });
+		});
+
+		it('should return false for a non-supported token', () => {
+			const moduleEndpointContext = createTransientModuleEndpointContext({
+				stateStore,
+				params: { tokenID: '8888888888888888' },
+			});
+
+			expect(endpoint.isSupported(moduleEndpointContext)).toEqual({ supported: false });
 		});
 	});
 });

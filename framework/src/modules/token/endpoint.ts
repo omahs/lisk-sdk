@@ -29,14 +29,16 @@ import { EscrowStore, EscrowStoreData } from './stores/escrow';
 import { SupplyStore } from './stores/supply';
 import { UserStore } from './stores/user';
 import { splitTokenID } from './utils';
+import { ModuleConfig } from './types';
 
 export class TokenEndpoint extends BaseEndpoint {
 	private _tokenMethod!: TokenMethod;
 	private _supportedTokenIDs: string[] = [];
 
-	public init(tokenMethod: TokenMethod, supportedTokenIDs: string[]) {
+	public init(tokenMethod: TokenMethod, config: ModuleConfig) {
 		this._tokenMethod = tokenMethod;
-		this._supportedTokenIDs = supportedTokenIDs;
+		this._supportedTokenIDs = config.supportedTokenIDs;
+		this._initializationFees = config.initializationFees;
 	}
 
 	public async getBalances(
@@ -122,6 +124,13 @@ export class TokenEndpoint extends BaseEndpoint {
 		};
 	}
 
+	public isSupported(context: ModuleEndpointContext) {
+		return {
+			supported:
+				this._supportedTokenIDs.find(tokenID => tokenID === context.params.tokenID) !== undefined,
+		};
+	}
+
 	// eslint-disable-next-line @typescript-eslint/require-await
 	public async getEscrowedAmounts(
 		context: ModuleEndpointContext,
@@ -143,5 +152,9 @@ export class TokenEndpoint extends BaseEndpoint {
 				};
 			}),
 		};
+	}
+
+	public getInitializationFees(_context: ModuleEndpointContext) {
+		return this._initializationFees;
 	}
 }

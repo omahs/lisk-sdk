@@ -40,6 +40,16 @@ export const configSchema = {
 				format: 'hex',
 			},
 		},
+		initializationFees: {
+			items: {
+				type: 'object',
+				required: ['userAccount', 'escrowAccount'],
+				properties: {
+					userAccount: { dataType: 'string', fieldNumber: 1 },
+					escrowAccount: { dataType: 'string', fieldNumber: 2 },
+				},
+			},
+		},
 	},
 };
 

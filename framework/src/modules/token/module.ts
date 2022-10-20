@@ -137,7 +137,7 @@ export class TokenModule extends BaseInteroperableModule {
 			amount: BigInt(mb.amount),
 		}));
 		this.method.init({ minBalances: this._minBalances });
-		this.endpoint.init(this.method, config.supportedTokenIDs);
+		this.endpoint.init(this.method, config);
 		this._transferCommand.init({
 			method: this.method,
 		});

@@ -36,6 +36,9 @@ export const LOCAL_ID_LSK = Buffer.alloc(LOCAL_ID_LENGTH, 0);
 export const TOKEN_ID_LSK = Buffer.from([0, 0, 0, 1, 0, 0, 0, 0]);
 export const CHAIN_ID_ALIAS_NATIVE = Buffer.alloc(CHAIN_ID_LENGTH, 0);
 
+export const USER_ACCOUNT_INITIALIZATION_FEE = '50000000';
+export const ESCROW_ACCOUNT_INITIALIZATION_FEE = '50000000';
+
 export const defaultConfig = {
 	minBalances: [
 		{
@@ -44,6 +47,10 @@ export const defaultConfig = {
 		},
 	],
 	supportedTokenIDs: [],
+	initializationFees: {
+		userAccount: USER_ACCOUNT_INITIALIZATION_FEE,
+		escrowAccount: ESCROW_ACCOUNT_INITIALIZATION_FEE,
+	},
 };
 
 export const EMPTY_BYTES = Buffer.alloc(0);
