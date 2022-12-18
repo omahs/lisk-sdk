@@ -38,6 +38,8 @@ import {
 	ChainStatus,
 	Schema,
 	OwnChainAccountJSON,
+	LastCertificate,
+	LastCertificateJSON,
 } from 'lisk-sdk';
 import {
 	CCU_FREQUENCY,
@@ -89,10 +91,11 @@ export class ChainConnectorPlugin extends BasePlugin<ChainConnectorPluginConfig>
 	public configSchema = configSchema;
 	private _chainConnectorPluginDB!: liskDB.Database;
 	private _sidechainChainConnectorStore!: ChainConnectorStore;
-	private _lastCertifiedHeight!: number;
+	private _lastCertificate!: LastCertificate;
 	private _ccuFrequency!: number;
 	private _mainchainAPIClient!: apiClient.APIClient;
 	private _sidechainAPIClient!: apiClient.APIClient;
+	private _ownChainID!: Buffer;
 	private readonly _sentCCUs: SentCCUs = [];
 
 	public get nodeModulePath(): string {
@@ -124,13 +127,147 @@ export class ChainConnectorPlugin extends BasePlugin<ChainConnectorPluginConfig>
 		// eslint-disable-next-line no-console
 		console.log(this._sentCCUs);
 		// TODO: Fetch the certificate height from last sent CCU and update the height
-		this._lastCertifiedHeight = 0;
 
 		// TODO: CCM should be collected and stored via events
 		if (this._sidechainAPIClient) {
+			this._ownChainID = Buffer.from(
+				(
+					await this._sidechainAPIClient.invoke<OwnChainAccountJSON>(
+						'interoperability_getOwnChainAccount',
+					)
+				).chainID,
+				'hex',
+			);
+			// Fetch last certificate from the receiving chain and update the _lastCertificate
+			const lastCertificate = await this._mainchainAPIClient.invoke<LastCertificateJSON>(
+				'interoperability_getChainAccount',
+				{ chainID: this._ownChainID },
+			);
+			this._lastCertificate = {
+				height: lastCertificate.height,
+				stateRoot: Buffer.from(lastCertificate.stateRoot, 'hex'),
+				timestamp: lastCertificate.timestamp,
+				validatorsHash: Buffer.from(lastCertificate.validatorsHash, 'hex'),
+			};
+			// On a new block start with CCU creation process
 			this._sidechainAPIClient.subscribe('chain_newBlock', async (data?: Record<string, unknown>) =>
 				this._newBlockHandler(data),
 			);
+		}
+	}
+
+	private async _newBlockHandler(data?: Record<string, unknown>) {
+		const { blockHeader: receivedBlock } = data as unknown as Data;
+		const newBlockHeader = chain.BlockHeader.fromJSON(receivedBlock).toObject();
+		const blockHeaders = await this._sidechainChainConnectorStore.getBlockHeaders();
+		const aggregateCommits = await this._sidechainChainConnectorStore.getAggregateCommits();
+		const validatorsHashPreimages =
+			await this._sidechainChainConnectorStore.getValidatorsHashPreimage();
+
+		const indexBlockHeader = blockHeaders.findIndex(
+			header => header.height === newBlockHeader.height,
+		);
+		if (indexBlockHeader > -1) {
+			blockHeaders[indexBlockHeader] = newBlockHeader;
+		} else {
+			blockHeaders.push(newBlockHeader);
+		}
+		const bftParameters = await this._sidechainAPIClient.invoke<BFTParameters>(
+			'consensus_getBFTParameters',
+			{ height: newBlockHeader.height },
+		);
+
+		const events = await this._sidechainAPIClient.invoke<JSONObject<chain.EventAttr[]>>(
+			'chain_getEvents',
+			{ height: newBlockHeader.height },
+		);
+		if (events && events.length > 0) {
+			const ccmSendSuccessEvents = events.filter(
+				eventAttr =>
+					eventAttr.name === CCM_SEND_SUCCESS && eventAttr.module === MODULE_NAME_INTEROPERABILITY,
+			);
+
+			const ccmsFromEvents = [];
+			for (const e of ccmSendSuccessEvents) {
+				ccmsFromEvents.push(codec.decode<CCMsg>(ccmSchema, Buffer.from(e.data, 'hex')));
+			}
+
+			const { modules } = await this._sidechainAPIClient.invoke<{ modules: ModuleMetadata }>(
+				'system_getMetadata',
+			);
+			const interoperabilityMetadata = modules.find(m => m.name === MODULE_NAME_INTEROPERABILITY);
+			const store = interoperabilityMetadata?.stores.find(
+				s => s.data.$id === '/modules/interoperability/outbox',
+			);
+
+			const { chainID } = await this._sidechainAPIClient.invoke<OwnChainAccountJSON>(
+				'interoperability_getOwnChainAccount',
+			);
+
+			const outboxKey = Buffer.concat([
+				Buffer.from(store?.key as string, 'hex'),
+				Buffer.from(chainID, 'hex'),
+			]);
+			const stateProveResponse = await this._sidechainAPIClient.invoke<ProveResponse>(
+				'state_prove',
+				{
+					queries: [outboxKey],
+				},
+			);
+			const inclusionProofOutboxRoot: OutboxRootWitness = {
+				bitmap: stateProveResponse.proof.queries[0].bitmap,
+				siblingHashes: stateProveResponse.proof.siblingHashes,
+			};
+			const crossChainMessages = await this._sidechainChainConnectorStore.getCrossChainMessages();
+			crossChainMessages.push({
+				ccms: ccmsFromEvents,
+				height: newBlockHeader.height,
+				inclusionProof: inclusionProofOutboxRoot,
+			});
+
+			await this._sidechainChainConnectorStore.setCrossChainMessages(crossChainMessages);
+		}
+
+		const indexValidatorsData = validatorsHashPreimages.findIndex(v =>
+			v.validatorsHash.equals(bftParameters?.validatorsHash),
+		);
+		if (indexValidatorsData > -1) {
+			validatorsHashPreimages[indexValidatorsData] = {
+				certificateThreshold: bftParameters?.certificateThreshold,
+				validators: bftParameters?.validators,
+				validatorsHash: bftParameters?.validatorsHash,
+			};
+		} else {
+			validatorsHashPreimages.push({
+				certificateThreshold: bftParameters?.certificateThreshold,
+				validators: bftParameters?.validators,
+				validatorsHash: bftParameters?.validatorsHash,
+			});
+		}
+
+		if (newBlockHeader.aggregateCommit) {
+			const indexAggregateCommit = aggregateCommits.findIndex(
+				commit => commit.height === newBlockHeader.aggregateCommit.height,
+			);
+			if (indexAggregateCommit > -1) {
+				aggregateCommits[indexAggregateCommit] = newBlockHeader.aggregateCommit;
+			} else {
+				aggregateCommits.push(newBlockHeader.aggregateCommit);
+			}
+		}
+
+		// Save all the data
+		await this._sidechainChainConnectorStore.setBlockHeaders(blockHeaders);
+		await this._sidechainChainConnectorStore.setAggregateCommits(aggregateCommits);
+		await this._sidechainChainConnectorStore.setValidatorsHashPreimage(validatorsHashPreimages);
+
+		// When # of CCMs are there on the outbox to be sent or # of blocks passed from last certified height
+		if (this._ccuFrequency >= newBlockHeader.height - this._lastCertificate.height) {
+			// TODO: _createCCU needs to be implemented which will create and send the CCU transaction
+			await this._createCCU();
+			// if the transaction is successfully submitted then update the last certfied height and do the cleanup
+			// TODO: also check if the state is growing, delete everything from the inMemory state if it goes beyond last 3 rounds
+			await this._cleanup();
 		}
 	}
 
@@ -174,7 +311,7 @@ export class ChainConnectorPlugin extends BasePlugin<ChainConnectorPluginConfig>
 				const valid = await this._checkChainOfTrust(
 					blockHeader.validatorsHash,
 					blsKeyToBFTWeight,
-					validatorsData.certificateThreshold,
+					validatorsData.certificateThreshold as bigint,
 					aggregateCommits[height],
 				);
 
@@ -203,7 +340,7 @@ export class ChainConnectorPlugin extends BasePlugin<ChainConnectorPluginConfig>
 		const blockHeaders = await this._sidechainChainConnectorStore.getBlockHeaders();
 
 		await this._sidechainChainConnectorStore.setBlockHeaders(
-			blockHeaders.filter(blockHeader => blockHeader.height >= this._lastCertifiedHeight),
+			blockHeaders.filter(blockHeader => blockHeader.height >= this._lastCertificate.height),
 		);
 	}
 
@@ -212,7 +349,7 @@ export class ChainConnectorPlugin extends BasePlugin<ChainConnectorPluginConfig>
 
 		await this._sidechainChainConnectorStore.setAggregateCommits(
 			aggregateCommits.filter(
-				aggregateCommit => aggregateCommit.height >= this._lastCertifiedHeight,
+				aggregateCommit => aggregateCommit.height >= this._lastCertificate.height,
 			),
 		);
 	}
@@ -223,7 +360,8 @@ export class ChainConnectorPlugin extends BasePlugin<ChainConnectorPluginConfig>
 
 		await this._sidechainChainConnectorStore.setValidatorsHashPreimage(
 			validatorsHashPreimage.filter(
-				validatorsData => validatorsData.certificateThreshold >= BigInt(this._lastCertifiedHeight),
+				validatorsHashPreimage =>
+					validatorsHashPreimage.certificateThreshold >= BigInt(this._lastCertificate.height),
 			),
 		);
 	}
@@ -325,142 +463,18 @@ export class ChainConnectorPlugin extends BasePlugin<ChainConnectorPluginConfig>
 		};
 	}
 
-	private async _newBlockHandler(data?: Record<string, unknown>) {
-		const { blockHeader: receivedBlock } = data as unknown as Data;
-		const newBlockHeader = chain.BlockHeader.fromJSON(receivedBlock).toObject();
-		const blockHeaders = await this._sidechainChainConnectorStore.getBlockHeaders();
-		const aggregateCommits = await this._sidechainChainConnectorStore.getAggregateCommits();
-		const validatorsHashPreimage =
-			await this._sidechainChainConnectorStore.getValidatorsHashPreimage();
-
-		const blockHeaderIndex = blockHeaders.findIndex(
-			header => header.height === newBlockHeader.height,
-		);
-		if (blockHeaderIndex > -1) {
-			blockHeaders[blockHeaderIndex] = newBlockHeader;
-		} else {
-			blockHeaders.push(newBlockHeader);
-		}
-		const bftParameters = await this._sidechainAPIClient.invoke<BFTParameters>(
-			'consensus_getBFTParameters',
-			{ height: newBlockHeader.height },
-		);
-
-		const events = await this._sidechainAPIClient.invoke<JSONObject<chain.EventAttr[]>>(
-			'chain_getEvents',
-			{ height: newBlockHeader.height },
-		);
-		if (events && events.length > 0) {
-			const ccmSendSuccessEvents = events.filter(
-				eventAttr =>
-					eventAttr.name === CCM_SEND_SUCCESS && eventAttr.module === MODULE_NAME_INTEROPERABILITY,
-			);
-
-			const ccmsFromEvents = [];
-			for (const e of ccmSendSuccessEvents) {
-				ccmsFromEvents.push(codec.decode<CCMsg>(ccmSchema, Buffer.from(e.data, 'hex')));
-			}
-
-			const { modules } = await this._sidechainAPIClient.invoke<{ modules: ModuleMetadata }>(
-				'system_getMetadata',
-			);
-			const interopModuleMetadata = modules.find(m => m.name === MODULE_NAME_INTEROPERABILITY);
-			const store = interopModuleMetadata?.stores.find(
-				s => s.data.$id === '/modules/interoperability/outbox',
-			);
-
-			const { chainID } = await this._sidechainAPIClient.invoke<OwnChainAccountJSON>(
-				'interoperability_ownChainAccount',
-			);
-
-			const outboxKey = Buffer.concat([
-				Buffer.from(store?.key as string, 'hex'),
-				Buffer.from(chainID, 'hex'),
-			]);
-			const stateProveResponse = await this._sidechainAPIClient.invoke<ProveResponse>(
-				'state_prove',
-				{
-					queries: [outboxKey],
-				},
-			);
-			const inclusionProofOutboxRoot: OutboxRootWitness = {
-				bitmap: stateProveResponse.proof.queries[0].bitmap,
-				siblingHashes: stateProveResponse.proof.siblingHashes,
-			};
-			const crossChainMessages = await this._sidechainChainConnectorStore.getCrossChainMessages();
-			crossChainMessages.push({
-				ccms: ccmsFromEvents,
-				height: newBlockHeader.height,
-				inclusionProof: inclusionProofOutboxRoot,
-			});
-
-			await this._sidechainChainConnectorStore.setCrossChainMessages(crossChainMessages);
-		}
-
-		const validatorsDataIndex = validatorsHashPreimage.findIndex(v =>
-			v.validatorsHash.equals(bftParameters?.validatorsHash),
-		);
-		const validatorsHashPreimageData = {
-			certificateThreshold: bftParameters?.certificateThreshold,
-			validators: bftParameters?.validators,
-			validatorsHash: bftParameters?.validatorsHash,
-		};
-		if (validatorsDataIndex > -1) {
-			validatorsHashPreimage[validatorsDataIndex] = validatorsHashPreimageData;
-		} else {
-			validatorsHashPreimage.push(validatorsHashPreimageData);
-		}
-
-		if (newBlockHeader.aggregateCommit) {
-			const aggregateCommitIndex = aggregateCommits.findIndex(
-				commit => commit.height === newBlockHeader.aggregateCommit.height,
-			);
-			if (aggregateCommitIndex > -1) {
-				aggregateCommits[aggregateCommitIndex] = newBlockHeader.aggregateCommit;
-			} else {
-				aggregateCommits.push(newBlockHeader.aggregateCommit);
-			}
-		}
-
-		// Save all the data
-		await this._sidechainChainConnectorStore.setBlockHeaders(blockHeaders);
-		await this._sidechainChainConnectorStore.setAggregateCommits(aggregateCommits);
-		await this._sidechainChainConnectorStore.setValidatorsHashPreimage(validatorsHashPreimage);
-
-		// When # of CCMs are there on the outbox to be sent or # of blocks passed from last certified height
-		if (this._ccuFrequency >= newBlockHeader.height - this._lastCertifiedHeight) {
-			// TODO: _createCCU needs to be implemented which will create and send the CCU transaction
-
-			// @ts-expect-error unused constant ccmsWithHeight
-			const ccmsWithHeight = await this._sidechainChainConnectorStore.getCrossChainMessages();
-
-			// TODO: update `certificate` after 7908 is merged
-			const certificate = {} as Certificate;
-
-			// @ts-expect-error unused constant groupedCCMsBySize
-			const groupedCCMsBySize = this._groupCCMsBySize(
-				await this._sidechainChainConnectorStore.getCrossChainMessages(),
-				certificate,
-			);
-			await this._createCCU();
-			// if the transaction is successfully submitted then update the last certfied height and do the cleanup
-			// TODO: also check if the state is growing, delete everything from the inMemory state if it goes beyond last 3 rounds
-			await this._cleanup();
-		}
-	}
-
 	/**
 	 * This will return lists with sub-lists, where total size of CCMs in each sub-list will be <= CCU_TOTAL_CCM_SIZE
 	 * Each sublist can contain CCMS from DIFFERENT heights
 	 */
-	private _groupCCMsBySize(
+	protected _groupCCMsBySize(
 		ccmsFromEvents: CrossChainMessagesFromEvents[],
 		certificate: Certificate,
 	): CCMsg[][] {
 		const groupedCCMsBySize: CCMsg[][] = [];
 
 		const filteredCCMsFromEvents = ccmsFromEvents.filter(
-			ccm => ccm.height <= certificate.height && ccm.height > this._lastCertifiedHeight,
+			ccm => ccm.height <= certificate.height && ccm.height > this._lastCertificate.height,
 		);
 
 		if (filteredCCMsFromEvents.length === 0) {
@@ -663,7 +677,7 @@ export class ChainConnectorPlugin extends BasePlugin<ChainConnectorPluginConfig>
 			sendingChainID,
 			certificateBytes,
 			weights,
-			validatorData.certificateThreshold,
+			validatorData.certificateThreshold as bigint,
 		);
 		if (hasValidWeightedAggSig) {
 			result.hasValidBLSWeightedAggSig = true;
@@ -706,7 +720,7 @@ export class ChainConnectorPlugin extends BasePlugin<ChainConnectorPluginConfig>
 	// eslint-disable-next-line @typescript-eslint/no-empty-function
 	private async _cleanup() {
 		const crossChainMessages = await this._sidechainChainConnectorStore.getCrossChainMessages();
-		const index = crossChainMessages.findIndex(ccm => ccm.height === this._lastCertifiedHeight);
+		const index = crossChainMessages.findIndex(ccm => ccm.height === this._lastCertificate.height);
 		crossChainMessages.splice(index, 1);
 		await this._sidechainChainConnectorStore.setCrossChainMessages(crossChainMessages);
 	}
