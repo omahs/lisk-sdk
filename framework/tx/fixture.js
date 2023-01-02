@@ -9,7 +9,7 @@ const {
 	mainchainRegParams,
 	sidechainRegParams,
 	stateRecoveryParamsSchema,
-	stateRecoveryInitParams,
+	stateRecoveryInitParamsSchema,
 	messageRecoveryParamsSchema,
 } = require('../dist-node/modules/interoperability/schemas');
 const { ed } = require('@liskhq/lisk-cryptography');
@@ -80,7 +80,9 @@ const crossChainUpdateTransactionParams = {
 				messageWitnessHashes: {
 					type: 'array',
 					fieldNumber: 2,
-					items: { dataType: 'bytes' },
+					items: {
+						dataType: 'bytes',
+					},
 				},
 				outboxRootWitness: {
 					type: 'object',
@@ -94,7 +96,9 @@ const crossChainUpdateTransactionParams = {
 						siblingHashes: {
 							type: 'array',
 							fieldNumber: 2,
-							items: { dataType: 'bytes' },
+							items: {
+								dataType: 'bytes',
+							},
 						},
 					},
 				},
@@ -131,7 +135,7 @@ const insertInteropsCommands = metadata => {
 		},
 		{
 			name: 'initializeStateRecovery',
-			params: stateRecoveryInitParams,
+			params: stateRecoveryInitParamsSchema,
 		},
 		{
 			name: 'recoverMessage',
@@ -140,7 +144,7 @@ const insertInteropsCommands = metadata => {
 		{
 			name: 'initializeMessageRecovery',
 			params: {
-				$id: 'lisk/interoperability/messageRecoveryInitialization',
+				$id: '/modules/interoperability/mainchain/messageRecoveryInitialization',
 				type: 'object',
 				required: ['chainID', 'channel', 'bitmap', 'siblingHashes'],
 				properties: {
@@ -229,12 +233,10 @@ const formatLSK = (title, value) => {
 	return `LSK ${lsk}`;
 };
 
-const mapName = (original) => {
+const mapName = original => {
 	switch (original) {
 		case 'crossChainTransfer':
 			return 'transferCrossChain';
-		case 'voteDelegate':
-			return 'vote';
 		case 'registerMultisignatureGroup':
 			return 'registerMultisignature';
 		case 'reportDelegateMisbehavior':
@@ -242,7 +244,6 @@ const mapName = (original) => {
 		default:
 			return original;
 	}
-
 };
 
 const getNested = (obj, key) => {
@@ -259,7 +260,7 @@ const getNested = (obj, key) => {
 };
 
 (async () => {
-	const { app } = Application.defaultApplication();
+	const { app } = Application.defaultApplication({ genesis: { chainID: '00000000' } });
 	const privateKey = Buffer.from(fixture.privateKey, 'hex');
 	const metadata = app.getMetadata();
 	console.log(JSON.stringify(metadata, undefined, '  '));
@@ -273,10 +274,19 @@ const getNested = (obj, key) => {
 			input.unsignedTransaction.module,
 			input.unsignedTransaction.command,
 		);
+
+		try {
+			if (Object.keys(input.unsignedTransaction.params).length > 0) {
+				codec.encodeJSON(paramsSchema, input.unsignedTransaction.params);
+			}
+		} catch (error) {
+			console.error(error);
+		}
 		const encodedParams =
 			Object.keys(input.unsignedTransaction.params).length > 0
 				? codec.encodeJSON(paramsSchema, input.unsignedTransaction.params)
 				: Buffer.alloc(0);
+
 		const unsignedTx = {
 			...input.unsignedTransaction,
 			params: encodedParams.toString('hex'),

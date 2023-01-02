@@ -37,7 +37,6 @@ const tokenTransferKeys = {
 		'fee',
 		'params.tokenID',
 		'params.amount',
-		'params.accountInitializationFee',
 		'params.recipientAddress',
 	],
 	detailKeys: [
@@ -48,7 +47,6 @@ const tokenTransferKeys = {
 		'params.tokenID',
 		'params.amount',
 		'params.recipientAddress',
-		'params.accountInitializationFee',
 		'params.data',
 	],
 };
@@ -64,7 +62,6 @@ const createTokenTransfer = () => ({
 			tokenID: utils.getRandomBytes(8).toString('hex'),
 			amount: randomUInt64().toString(),
 			recipientAddress: randomAddress(),
-			accountInitializationFee: randomUInt64().toString(),
 			data: randomData(),
 		},
 		signatures: [],
@@ -80,7 +77,6 @@ const crossChainTransferKeys = {
 		'params.tokenID',
 		'params.amount',
 		'params.recipientAddress',
-		'params.escrowInitializationFee',
 		'params.receivingChainID',
 	],
 	detailKeys: [
@@ -92,7 +88,6 @@ const crossChainTransferKeys = {
 		'params.recipientAddress',
 		'params.receivingChainID',
 		'params.messageFee',
-		'params.escrowInitializationFee',
 		'params.data',
 	],
 };
@@ -110,7 +105,6 @@ const createCrossChainTokenTransfer = () => ({
 			receivingChainID: utils.getRandomBytes(4).toString('hex'),
 			recipientAddress: randomAddress(),
 			messageFee: randomUInt64().toString(),
-			escrowInitializationFee: randomUInt64().toString(),
 			data: randomData(),
 		},
 		signatures: [],
@@ -166,7 +160,7 @@ const createRegisterMultisignatureGroup = () => {
 	};
 };
 
-const registerDelegateKey = {
+const registerValidatorKey = {
 	summaryKeys: ['module', 'command', 'fee', 'params.name'],
 	detailKeys: [
 		'module',
@@ -179,10 +173,10 @@ const registerDelegateKey = {
 	],
 };
 
-const createRegisterDelegate = () => ({
+const createRegisterValidator = () => ({
 	unsignedTransaction: {
-		module: 'dpos',
-		command: 'registerDelegate',
+		module: 'pos',
+		command: 'registerValidator',
 		nonce: randomUInt64().toString(),
 		fee: randomUInt64().toString(),
 		senderPublicKey: publicKey,
@@ -191,11 +185,10 @@ const createRegisterDelegate = () => ({
 			blsKey: utils.getRandomBytes(48).toString('hex'),
 			proofOfPossession: utils.getRandomBytes(96).toString('hex'),
 			generatorKey: utils.getRandomBytes(32).toString('hex'),
-			delegateRegistrationFee: randomUInt64().toString(),
 		},
 		signatures: [],
 	},
-	...registerDelegateKey,
+	...registerValidatorKey,
 });
 
 const voteDelegateKey = {
@@ -203,16 +196,16 @@ const voteDelegateKey = {
 	detailKeys: ['module', 'command', 'fee', 'params.votes'],
 };
 
-const createVoteDelegate = () => ({
+const createStakeValidator = () => ({
 	unsignedTransaction: {
-		module: 'dpos',
-		command: 'vote',
+		module: 'pos',
+		command: 'stake',
 		nonce: randomUInt64().toString(),
 		fee: randomUInt64().toString(),
 		senderPublicKey: publicKey,
 		params: {
-			votes: new Array(randomNumber(20)).fill(0).map(() => ({
-				delegateAddress: randomAddress(),
+			stakes: new Array(randomNumber(20)).fill(0).map(() => ({
+				validatorAddress: randomAddress(),
 				amount: randomUInt64().toString(),
 			})),
 		},
@@ -228,7 +221,7 @@ const unlockKey = {
 
 const createUnlock = () => ({
 	unsignedTransaction: {
-		module: 'dpos',
+		module: 'pos',
 		command: 'unlock',
 		nonce: randomUInt64().toString(),
 		fee: randomUInt64().toString(),
@@ -239,14 +232,52 @@ const createUnlock = () => ({
 	...unlockKey,
 });
 
-const reportDelegateMisbehaviorKey = {
+const createClaimRewardsKey = {
 	summaryKeys: ['module', 'command', 'fee'],
 	detailKeys: ['module', 'command', 'fee'],
 };
 
-const createReportDelegateMisbehavior = () => ({
+const createClaimRewards = () => ({
 	unsignedTransaction: {
-		module: 'dpos',
+		module: 'pos',
+		command: 'claimRewards',
+		nonce: randomUInt64().toString(),
+		fee: randomUInt64().toString(),
+		senderPublicKey: publicKey,
+		params: {},
+		signatures: [],
+	},
+	...createClaimRewardsKey,
+});
+
+const createChangeCommissionKey = {
+	summaryKeys: ['module', 'command', 'fee', 'params.newCommission'],
+	detailKeys: ['module', 'command', 'fee', 'params.newCommission'],
+};
+
+const createChangeCommission = () => ({
+	unsignedTransaction: {
+		module: 'pos',
+		command: 'changeCommission',
+		nonce: randomUInt64().toString(),
+		fee: randomUInt64().toString(),
+		senderPublicKey: publicKey,
+		params: {
+			newCommission: randomNumber(10000),
+		},
+		signatures: [],
+	},
+	...createChangeCommissionKey,
+});
+
+const reportMisbehaviorKey = {
+	summaryKeys: ['module', 'command', 'fee'],
+	detailKeys: ['module', 'command', 'fee'],
+};
+
+const createReportMisbehavior = () => ({
+	unsignedTransaction: {
+		module: 'pos',
 		command: 'reportMisbehavior',
 		nonce: randomUInt64().toString(),
 		fee: randomUInt64().toString(),
@@ -257,7 +288,7 @@ const createReportDelegateMisbehavior = () => ({
 		},
 		signatures: [],
 	},
-	...reportDelegateMisbehaviorKey,
+	...reportMisbehaviorKey,
 });
 
 const sidechainCCUpdateKey = {
@@ -402,7 +433,6 @@ const createSidechainRegistration = () => ({
 				bftWeight: randomNumber(103).toString(),
 			})),
 			certificateThreshold: randomNumber(103).toString(),
-			sidechainRegistrationFee: randomUInt64().toString(),
 		},
 		signatures: [],
 	},
@@ -450,7 +480,7 @@ const createStateRecovery = () => ({
 			chainID: utils.getRandomBytes(4).toString('hex'),
 			module: utils.getRandomBytes(4).toString('hex'),
 			storeEntries: new Array(randomNumber(16)).fill(0).map(() => ({
-				storePrefix: utils.getRandomBytes(2).toString('hex'),
+				substorePrefix: utils.getRandomBytes(2).toString('hex'),
 				storeKey: utils.getRandomBytes(randomNumber(50)).toString('hex'),
 				storeValue: utils.getRandomBytes(randomNumber(100)).toString('hex'),
 				bitmap: utils.getRandomBytes(randomNumber(8)).toString('hex'),
@@ -518,10 +548,12 @@ const createData = count => {
 	data.push(...new Array(count).fill(0).map(() => createTokenTransfer()));
 	data.push(...new Array(count).fill(0).map(() => createCrossChainTokenTransfer()));
 	data.push(...new Array(count).fill(0).map(() => createRegisterMultisignatureGroup()));
-	data.push(...new Array(count).fill(0).map(() => createRegisterDelegate()));
-	data.push(...new Array(count).fill(0).map(() => createVoteDelegate()));
+	data.push(...new Array(count).fill(0).map(() => createRegisterValidator()));
+	data.push(...new Array(count).fill(0).map(() => createStakeValidator()));
 	data.push(...new Array(count).fill(0).map(() => createUnlock()));
-	data.push(...new Array(count).fill(0).map(() => createReportDelegateMisbehavior()));
+	data.push(...new Array(count).fill(0).map(() => createClaimRewards()));
+	data.push(...new Array(count).fill(0).map(() => createChangeCommission()));
+	data.push(...new Array(count).fill(0).map(() => createReportMisbehavior()));
 	data.push(...new Array(count).fill(0).map(() => createCCUpdate('Mainchain')));
 	data.push(...new Array(count).fill(0).map(() => createCCUpdate('Sidechain')));
 	data.push(...new Array(count).fill(0).map(() => createMainchainRegistration()));
