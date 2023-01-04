@@ -12,7 +12,6 @@
  * Removal or modification of this copyright notice is prohibited.
  */
 
-import { crossChainUpdateTransactionParams } from 'lisk-framework/dist-node/modules/interoperability/schemas';
 import {
 	BasePlugin,
 	PluginInitContext,
@@ -43,6 +42,7 @@ import {
 	tree,
 	CrossChainUpdateTransactionParams,
 	certificateSchema,
+	ccuParamsSchema,
 } from 'lisk-sdk';
 import { calculateActiveValidatorsUpdate } from './active_validators_update';
 import { getNextCertificateFromAggregateCommits } from './certificate_generation';
@@ -182,14 +182,14 @@ export class ChainConnectorPlugin extends BasePlugin<ChainConnectorPluginConfig>
 		// When # of CCMs are there on the outbox to be sent or # of blocks passed from last certified height
 		if (this._ccuFrequency >= newBlockHeader.height - this._lastCertificate.height) {
 			await this._calculateCCUParams();
-			// if the transaction is successfully submitted then update the last certfied height and do the cleanup
+			// if the transaction is successfully sent then update the last certfied height and do the cleanup
 			// TODO: also check if the state is growing, delete everything from the inMemory state if it goes beyond last 3 rounds
 			await this._cleanup();
 		}
 	}
 
 	private async _saveDataOnNewBlock(newBlockHeader: BlockHeader) {
-		// Save blockheader if a new block header
+		// Save block header if a new block header arrives
 		const blockHeaders = await this._sidechainChainConnectorStore.getBlockHeaders();
 
 		const indexBlockHeader = blockHeaders.findIndex(
@@ -352,33 +352,37 @@ export class ChainConnectorPlugin extends BasePlugin<ChainConnectorPluginConfig>
 			this._lastCertificate,
 		);
 		if (!certificate) {
-			throw new Error('No certificate found in the ccu creation process.');
+			throw new Error('No certificate found in the CCU creation process.');
 		}
 		// Calculate activeValidatorsUpdate
 		let activeValidatorsUpdate: ActiveValidator[] = [];
 		let certificateThreshold = BigInt(0);
 		const blockHeader = blockHeaders.find(header => header.height === certificate.height);
 		if (!blockHeader) {
-			throw new Error('No block header found for the given certificate height.')
+			throw new Error('No block header found for the given certificate height.');
 		}
 		if (!this._lastCertificate.validatorsHash.equals(certificate.validatorsHash)) {
-			const validatorsUpdateResult = calculateActiveValidatorsUpdate(blockHeader, validatorsHashPreimages, this._lastCertificate);
+			const validatorsUpdateResult = calculateActiveValidatorsUpdate(
+				certificate,
+				validatorsHashPreimages,
+				this._lastCertificate,
+			);
 			activeValidatorsUpdate = validatorsUpdateResult.activeValidatorsUpdate;
 			certificateThreshold = validatorsUpdateResult.certificateThreshold;
 		}
 		// Calculate inboxUpdate
-		const inboxUpdates = await this._calculateInboxUpdate(blockHeader);
+		const inboxUpdates = await this._calculateInboxUpdate(certificate);
 
 		// Now create CCUs for all the inboxUpdates handling full or partial updates
+		const serializedCertificate = codec.encode(certificateSchema, certificate);
 		for (const inboxUpdate of inboxUpdates) {
-			const serializedCertificate = codec.encode(certificateSchema, certificate);
-			const serializedCCUParams = codec.encode(crossChainUpdateTransactionParams, {
+			const serializedCCUParams = codec.encode(ccuParamsSchema, {
 				sendingChainID: this._ownChainID,
 				activeValidatorsUpdate,
 				certificate: serializedCertificate,
 				certificateThreshold,
-				inboxUpdate
-			} as CrossChainUpdateTransactionParams)
+				inboxUpdate,
+			} as CrossChainUpdateTransactionParams);
 			await this._createCCU(serializedCCUParams);
 		}
 	}
@@ -392,53 +396,100 @@ export class ChainConnectorPlugin extends BasePlugin<ChainConnectorPluginConfig>
 		this._sidechainChainConnectorStore.close();
 	}
 
-	private async _calculateInboxUpdate(newBlockHeader: BlockHeader): Promise<InboxUpdate[]> {
+	private async _calculateInboxUpdate(certificate: Certificate): Promise<InboxUpdate[]> {
 		const crossChainMessages = await this._sidechainChainConnectorStore.getCrossChainMessages();
-		const ccmsListOfList = this._getListOfCCMs(crossChainMessages, newBlockHeader);
+
+		// Filter all the CCMs to be included between lastCertifiedheight and certificate height.
+		const ccmsToBeIncluded = crossChainMessages.filter(
+			ccmFromEvents =>
+				ccmFromEvents.height <= certificate.height &&
+				ccmFromEvents.height > this._lastCertificate.height,
+		);
+		const ccmsListOfList = this._groupCCMsBySize(ccmsToBeIncluded);
+		// Take the inclusion proof of the last CCM to be included.
+		const { inclusionProof } = ccmsToBeIncluded[ccmsToBeIncluded.length - 1];
 
 		if (ccmsListOfList.length === 1) {
 			const ccmHashesList = ccmsListOfList[0].map(ccm => codec.encode(ccmSchema, ccm));
-			// Take the inclusion proof of the last ccm height
-			const inclusionProof = ccmsListOfList[0][ccmsListOfList[0].length - 1].inclusionProof;
-
-			return [{
-				crossChainMessages: ccmHashesList,
-				messageWitnessHashes: [],
-				outboxRootWitness: inclusionProof,
-			}];
+			return [
+				{
+					crossChainMessages: ccmHashesList,
+					messageWitnessHashes: [],
+					outboxRootWitness: inclusionProof,
+				},
+			];
 		}
 
 		// Calculate list of inboxUpdates to be sent by multiple CCUs
-		const listOfInboxUpdates = [];
+		const inboxUpdates = [];
 		for (const subList of ccmsListOfList) {
 			const ccmHashesList = subList.map(ccm => codec.encode(ccmSchema, ccm));
-			// Take the inclusion proof of the last ccm height
-			const inclusionProof = subList[subList.length - 1].inclusionProof;
-
 			// Calculate message witnesses
 
 			const merkleTree = new tree.MerkleTree({ db: this._chainConnectorPluginDB });
 			for (const ccm of ccmHashesList) {
-					merkleTree.append(ccm);
-				}
+				await merkleTree.append(ccm);
+			}
 			const messageWitness = await merkleTree.generateRightWitness(ccmHashesList.length);
 
-			listOfInboxUpdates.push({
+			inboxUpdates.push({
 				crossChainMessages: ccmHashesList,
 				messageWitnessHashes: messageWitness,
 				outboxRootWitness: inclusionProof,
 			});
 		}
 
-		return listOfInboxUpdates;
+		return inboxUpdates;
 	}
 
-	//
-	private _getListOfCCMs(
-		_crossChainMessages: CrossChainMessagesFromEvents[],
-		_newBlockHeader: BlockHeader,
-	): { ccm: CCMsg, height: number, inclusionProof: OutboxRootWitness }[][] {
-		return [[]];
+	/**
+	 * This will return lists with sub-lists, where total size of CCMs in each sub-list will be <= CCU_TOTAL_CCM_SIZE
+	 * Each sublist can contain CCMS from DIFFERENT heights
+	 */
+	private _groupCCMsBySize(ccmsFromEvents: CrossChainMessagesFromEvents[]): CCMsg[][] {
+		const groupedCCMsBySize: CCMsg[][] = [];
+
+		if (ccmsFromEvents.length === 0) {
+			return groupedCCMsBySize;
+		}
+
+		const allCCMs: CCMsg[] = [];
+		for (const filteredCCMsFromEvent of ccmsFromEvents) {
+			allCCMs.push(...filteredCCMsFromEvent.ccms);
+		}
+
+		// This will group/bundle CCMs in a list where total size of the list will be <= CCU_TOTAL_CCM_SIZE
+		const groupBySize = (startIndex: number): [list: CCMsg[], newIndex: number] => {
+			const newList: CCMsg[] = [];
+			let totalSize = 0;
+			let i = startIndex;
+
+			for (; i < allCCMs.length; i += 1) {
+				const ccm = allCCMs[i];
+				const ccmBytes = codec.encode(ccmSchema, ccm);
+				const size = ccmBytes.length;
+				totalSize += size;
+				if (totalSize > CCU_TOTAL_CCM_SIZE) {
+					return [newList, i];
+				}
+
+				newList.push(ccm);
+			}
+
+			return [newList, i];
+		};
+
+		const buildGroupsBySize = (startIndex: number) => {
+			const [list, lastIndex] = groupBySize(startIndex);
+			groupedCCMsBySize.push(list);
+
+			if (lastIndex < allCCMs.length) {
+				buildGroupsBySize(lastIndex);
+			}
+		};
+
+		buildGroupsBySize(0);
+		return groupedCCMsBySize;
 	}
 
 	public async validateCertificate(
@@ -509,7 +560,7 @@ export class ChainConnectorPlugin extends BasePlugin<ChainConnectorPluginConfig>
 			sendingChainID,
 			certificateBytes,
 			weights,
-			validatorData.certificateThreshold as bigint,
+			validatorData.certificateThreshold,
 		);
 		if (hasValidWeightedAggSig) {
 			result.hasValidBLSWeightedAggSig = true;
@@ -549,15 +600,22 @@ export class ChainConnectorPlugin extends BasePlugin<ChainConnectorPluginConfig>
 		return result;
 	}
 
-	private async _deleteBlockHeaders() {
+	private async _cleanup() {
+		// Delete CCMs
+		const crossChainMessages = await this._sidechainChainConnectorStore.getCrossChainMessages();
+		const index = crossChainMessages.findIndex(ccm => ccm.height === this._lastCertificate.height);
+		crossChainMessages.splice(index, 1);
+
+		await this._sidechainChainConnectorStore.setCrossChainMessages(crossChainMessages);
+
+		// Delete blockHeaders
 		const blockHeaders = await this._sidechainChainConnectorStore.getBlockHeaders();
 
 		await this._sidechainChainConnectorStore.setBlockHeaders(
 			blockHeaders.filter(blockHeader => blockHeader.height >= this._lastCertificate.height),
 		);
-	}
 
-	private async _deleteAggregateCommits() {
+		// Delete aggregateCommits
 		const aggregateCommits = await this._sidechainChainConnectorStore.getAggregateCommits();
 
 		await this._sidechainChainConnectorStore.setAggregateCommits(
@@ -565,9 +623,7 @@ export class ChainConnectorPlugin extends BasePlugin<ChainConnectorPluginConfig>
 				aggregateCommit => aggregateCommit.height >= this._lastCertificate.height,
 			),
 		);
-	}
-
-	private async _deleteValidatorsHashPreimage() {
+		// Delete validatorsHashPreimages
 		const validatorsHashPreimages =
 			await this._sidechainChainConnectorStore.getValidatorsHashPreimage();
 
@@ -577,18 +633,6 @@ export class ChainConnectorPlugin extends BasePlugin<ChainConnectorPluginConfig>
 					validatorsHashPreimage.certificateThreshold >= BigInt(this._lastCertificate.height),
 			),
 		);
-	}
-
-	// eslint-disable-next-line @typescript-eslint/no-empty-function
-	private async _cleanup() {
-		const crossChainMessages = await this._sidechainChainConnectorStore.getCrossChainMessages();
-		const index = crossChainMessages.findIndex(ccm => ccm.height === this._lastCertificate.height);
-		crossChainMessages.splice(index, 1);
-		await this._sidechainChainConnectorStore.setCrossChainMessages(crossChainMessages);
-
-		await this._deleteAggregateCommits();
-		await this._deleteBlockHeaders();
-		await this._deleteValidatorsHashPreimage();
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-empty-function
